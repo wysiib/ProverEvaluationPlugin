@@ -23,7 +23,10 @@ import org.eventb.core.pm.IProofComponent;
 import org.eventb.core.pm.IProofManager;
 import org.eventb.core.seqprover.IProofTree;
 import org.eventb.core.seqprover.IProverSequent;
-import org.eventb.core.seqprover.IReasoner;
+import org.eventb.core.seqprover.ITactic;
+import org.eventb.internal.core.seqprover.ProofTree;
+import org.eventb.internal.core.seqprover.ProofTreeNode;
+import org.eventb.internal.core.seqprover.Util;
 import org.rodinp.core.IRodinDB;
 import org.rodinp.core.IRodinElement;
 import org.rodinp.core.IRodinFile;
@@ -36,7 +39,7 @@ public class EvalCommand extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
 			List<IPOSequent> allProverSequents = getAllProverSequents();
-			List<IReasoner> allReasoners = getAllReasoners();
+			List<ITactic> allReasoners = getAllReasoners();
 			evaluateOnProvers(allProverSequents, allReasoners);
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
@@ -45,20 +48,31 @@ public class EvalCommand extends AbstractHandler {
 		return null;
 	}
 
-	private List<IReasoner> getAllReasoners() {
-		List<IReasoner> reasoners = new ArrayList<IReasoner>();
+	private List<ITactic> getAllReasoners() {
+		List<ITactic> reasoners = new ArrayList<ITactic>();
 
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry
-				.getExtensionPoint("org.eventb.core.seqprover.reasoners");
+				.getExtensionPoint("org.eventb.core.seqprover.autoTactics");
 		for (IExtension extension : extensionPoint.getExtensions()) {
 			for (IConfigurationElement configurationElement : extension
 					.getConfigurationElements()) {
 
-				if ("reasoner".equals(configurationElement.getName())) {
+				if ("autoTactic".equals(configurationElement.getName())) {
 					try {
-						reasoners.add((IReasoner) configurationElement
-								.createExecutableExtension("class"));
+						if (configurationElement.getAttribute("class")
+								.startsWith("org.eventb.core.seqprover")
+								|| configurationElement.getAttribute("class")
+										.startsWith("org.eventb.core.tests")) {
+							break;
+						}
+						Object x = configurationElement
+								.createExecutableExtension("class");
+
+						if (x instanceof ITactic) {
+							reasoners.add((ITactic) x);
+						}
+
 					} catch (final CoreException e) {
 						// this happens for some incomplete reasoners that can
 						// not be instantiated
@@ -72,12 +86,15 @@ public class EvalCommand extends AbstractHandler {
 		return reasoners;
 	}
 
+	@SuppressWarnings("restriction")
 	private void evaluateOnProvers(List<IPOSequent> allProverSequents,
-			List<IReasoner> allReasoners) throws RodinDBException {
+			List<ITactic> allReasoners) throws RodinDBException {
 
 		for (IPOSequent sequent : allProverSequents) {
-			for (IReasoner reasoner : allReasoners) {
-				reasoner.apply(toProverSequent(sequent), null, null);
+			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
+					.getRoot();
+			for (ITactic reasoner : allReasoners) {
+				reasoner.apply(node, Util.getNullProofMonitor());
 			}
 		}
 	}
