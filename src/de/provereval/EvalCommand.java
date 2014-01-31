@@ -9,6 +9,12 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eventb.core.EventBPlugin;
 import org.eventb.core.IPORoot;
 import org.eventb.core.IPOSequent;
@@ -17,6 +23,7 @@ import org.eventb.core.pm.IProofComponent;
 import org.eventb.core.pm.IProofManager;
 import org.eventb.core.seqprover.IProofTree;
 import org.eventb.core.seqprover.IProverSequent;
+import org.eventb.core.seqprover.IReasoner;
 import org.rodinp.core.IRodinDB;
 import org.rodinp.core.IRodinElement;
 import org.rodinp.core.IRodinFile;
@@ -24,14 +31,13 @@ import org.rodinp.core.IRodinProject;
 import org.rodinp.core.RodinCore;
 import org.rodinp.core.RodinDBException;
 
-import de.prob.eventb.disprover.core.DisproverReasoner;
-
 public class EvalCommand extends AbstractHandler {
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
 			List<IPOSequent> allProverSequents = getAllProverSequents();
-			evaluateOnProvers(allProverSequents);
+			List<IReasoner> allReasoners = getAllReasoners();
+			evaluateOnProvers(allProverSequents, allReasoners);
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,13 +45,40 @@ public class EvalCommand extends AbstractHandler {
 		return null;
 	}
 
-	private void evaluateOnProvers(List<IPOSequent> allProverSequents)
-			throws RodinDBException {
-		DisproverReasoner disprover = new DisproverReasoner();
+	private List<IReasoner> getAllReasoners() {
+		List<IReasoner> reasoners = new ArrayList<IReasoner>();
+
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+		IExtensionPoint extensionPoint = registry
+				.getExtensionPoint("org.eventb.core.seqprover.reasoners");
+		for (IExtension extension : extensionPoint.getExtensions()) {
+			for (IConfigurationElement configurationElement : extension
+					.getConfigurationElements()) {
+
+				if ("reasoner".equals(configurationElement.getName())) {
+					try {
+						reasoners.add((IReasoner) configurationElement
+								.createExecutableExtension("class"));
+					} catch (final CoreException e) {
+						// this happens for some incomplete reasoners that can
+						// not be instantiated
+					}
+
+				}
+
+			}
+
+		}
+		return reasoners;
+	}
+
+	private void evaluateOnProvers(List<IPOSequent> allProverSequents,
+			List<IReasoner> allReasoners) throws RodinDBException {
 
 		for (IPOSequent sequent : allProverSequents) {
-			disprover.apply(toProverSequent(sequent), null, null);
-
+			for (IReasoner reasoner : allReasoners) {
+				reasoner.apply(toProverSequent(sequent), null, null);
+			}
 		}
 	}
 
