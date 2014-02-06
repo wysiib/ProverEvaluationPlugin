@@ -1,41 +1,20 @@
 package de.provereval;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.commands.*;
+import org.eclipse.core.resources.*;
+import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
-import org.eventb.core.EventBPlugin;
-import org.eventb.core.IPORoot;
-import org.eventb.core.IPOSequent;
-import org.eventb.core.pm.IProofAttempt;
-import org.eventb.core.pm.IProofComponent;
-import org.eventb.core.pm.IProofManager;
-import org.eventb.core.seqprover.IProofTree;
-import org.eventb.core.seqprover.IProverSequent;
-import org.eventb.core.seqprover.ITactic;
-import org.eventb.internal.core.seqprover.ProofTree;
-import org.eventb.internal.core.seqprover.ProofTreeNode;
-import org.eventb.internal.core.seqprover.Util;
-import org.rodinp.core.IRodinDB;
-import org.rodinp.core.IRodinElement;
-import org.rodinp.core.IRodinFile;
-import org.rodinp.core.IRodinProject;
-import org.rodinp.core.RodinCore;
-import org.rodinp.core.RodinDBException;
+import org.eventb.core.*;
+import org.eventb.core.pm.*;
+import org.eventb.core.seqprover.*;
+import org.eventb.internal.core.seqprover.*;
+import org.rodinp.core.*;
 
 public class EvalCommand extends AbstractHandler {
 
+	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
 			List<IPOSequent> allProverSequents = getAllProverSequents();
@@ -94,7 +73,20 @@ public class EvalCommand extends AbstractHandler {
 			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
 					.getRoot();
 			for (ITactic reasoner : allReasoners) {
-				reasoner.apply(node, Util.getNullProofMonitor());
+
+				try {
+					reasoner.apply(node, Util.getNullProofMonitor());
+
+					if (node.isClosed()) {
+						System.out.println(sequent.getElementName()
+								+ " is open after " + reasoner.toString());
+					} else {
+						System.out.println(sequent.getElementName()
+								+ " is closed after " + reasoner.toString());
+					}
+				} catch (Exception e) {
+					// prover crashed somehow
+				}
 			}
 		}
 	}
