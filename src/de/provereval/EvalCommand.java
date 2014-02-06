@@ -7,24 +7,32 @@ import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eventb.core.*;
-import org.eventb.core.pm.*;
-import org.eventb.core.seqprover.*;
-import org.eventb.internal.core.seqprover.*;
+import org.eventb.core.seqprover.ITactic;
 import org.rodinp.core.*;
 
 public class EvalCommand extends AbstractHandler {
-
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
-			List<IPOSequent> allProverSequents = getAllProverSequents();
 			List<ITactic> allReasoners = getAllReasoners();
-			evaluateOnProvers(allProverSequents, allReasoners);
+			List<IPOSequent> allProverSequents = getAllProverSequents();
+
+			List<ProverEvaluationTask> tasks = generateTasks(allProverSequents,
+					allReasoners);
+
+			evaluate(tasks);
+
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void evaluate(List<ProverEvaluationTask> tasks) {
+		for (ProverEvaluationTask task : tasks) {
+			task.runTask();
+		}
 	}
 
 	private List<ITactic> getAllReasoners() {
@@ -65,30 +73,18 @@ public class EvalCommand extends AbstractHandler {
 		return reasoners;
 	}
 
-	@SuppressWarnings("restriction")
-	private void evaluateOnProvers(List<IPOSequent> allProverSequents,
-			List<ITactic> allReasoners) throws RodinDBException {
+	private List<ProverEvaluationTask> generateTasks(
+			List<IPOSequent> allProverSequents, List<ITactic> allReasoners)
+			throws RodinDBException {
+		List<ProverEvaluationTask> tasks = new ArrayList<ProverEvaluationTask>();
 
 		for (IPOSequent sequent : allProverSequents) {
-			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
-					.getRoot();
 			for (ITactic reasoner : allReasoners) {
-
-				try {
-					reasoner.apply(node, Util.getNullProofMonitor());
-
-					if (node.isClosed()) {
-						System.out.println(sequent.getElementName()
-								+ " is open after " + reasoner.toString());
-					} else {
-						System.out.println(sequent.getElementName()
-								+ " is closed after " + reasoner.toString());
-					}
-				} catch (Exception e) {
-					// prover crashed somehow
-				}
+				tasks.add(new ProverEvaluationTask(reasoner, sequent));
 			}
 		}
+
+		return tasks;
 	}
 
 	private List<IPOSequent> getAllProverSequents() throws RodinDBException {
@@ -114,18 +110,4 @@ public class EvalCommand extends AbstractHandler {
 		return sequents;
 	}
 
-	public static IProverSequent toProverSequent(IPOSequent sequent)
-			throws RodinDBException {
-		IPORoot poRoot = (IPORoot) sequent.getRoot();
-		IProofManager pm = EventBPlugin.getProofManager();
-		IProofComponent pc = pm.getProofComponent(poRoot);
-		IProofAttempt pa = pc.createProofAttempt(sequent.getElementName(),
-				"Translation in Prover Evaluation Plugin", null);
-		IProofTree proofTree = pa.getProofTree();
-
-		IProverSequent proverSequent = proofTree.getSequent();
-		pa.dispose();
-
-		return proverSequent;
-	}
 }
