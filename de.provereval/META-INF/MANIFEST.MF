@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.ui,
  org.rodinp.core,
  org.eventb.core,
  org.eventb.core.seqprover,
- de.prob.eventb.disprover.core
+ de.prob.eventb.disprover.core,
+ org.eclipse.ui.workbench
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
