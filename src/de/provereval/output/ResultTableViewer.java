@@ -27,11 +27,11 @@ public class ResultTableViewer extends TableViewer {
 		table.setLinesVisible(true);
 
 		setContentProvider(ArrayContentProvider.getInstance());
-		setInput(grouped);
+		setInput(grouped.values());
 	}
 
 	private void createColumns() {
-		createTableViewerColumn("Proof Obligation", 100, 0).setLabelProvider(
+		createTableViewerColumn("Proof Obligation", 200, 0).setLabelProvider(
 				new ColumnLabelProvider() {
 					@SuppressWarnings("unchecked")
 					@Override
@@ -44,7 +44,7 @@ public class ResultTableViewer extends TableViewer {
 		Collection<List<ProverEvaluationTask>> values = tasks.values();
 		List<ProverEvaluationTask> first = values.iterator().next();
 		for (final ProverEvaluationTask t : first) {
-			createTableViewerColumn(t.getProverName(), 100, 0)
+			createTableViewerColumn(t.getProverName(), 200, 0)
 					.setLabelProvider(new ColumnLabelProvider() {
 						@SuppressWarnings("unchecked")
 						@Override
@@ -54,7 +54,11 @@ public class ResultTableViewer extends TableViewer {
 							for (ProverEvaluationTask task : p) {
 								if (task.getProverName().equals(
 										t.getProverName())) {
-									return "" + task.isProven();
+									if (task.isProven()) {
+										return "proven";
+									} else {
+										return "-";
+									}
 								}
 							}
 
