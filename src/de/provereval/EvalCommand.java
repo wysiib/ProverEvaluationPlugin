@@ -6,22 +6,57 @@ import org.eclipse.core.commands.*;
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eventb.core.*;
 import org.eventb.core.seqprover.ITactic;
 import org.rodinp.core.*;
+
+import de.provereval.selectiondialogs.*;
 
 public class EvalCommand extends AbstractHandler {
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
-			List<ITactic> allReasoners = getAllReasoners();
-			List<IPOSequent> allProverSequents = getAllProverSequents();
+			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getShell();
 
+			// get all reasoners and ask the user which ones to benchmark
+			List<ITactic> allReasoners = getAllReasoners();
+			ListSelectionDialog dlg = new ListSelectionDialog(shell,
+					allReasoners, new ArrayContentProvider(),
+					new ReasonersLabelProvider(),
+					"Select the reasoners you want to apply:");
+			dlg.setTitle("Select Reasoners");
+			dlg.setInitialSelections(allReasoners.toArray());
+			dlg.open();
+
+			allReasoners.clear();
+			for (Object o : dlg.getResult()) {
+				allReasoners.add((ITactic) o);
+			}
+
+			// same for sequents
+			List<IPOSequent> allProverSequents = getAllProverSequents();
+			dlg = new ListSelectionDialog(shell, allProverSequents,
+					new ArrayContentProvider(), new SequentsLabelProvider(),
+					"Select the sequents you want the reasoners to be applied to:");
+			dlg.setTitle("Select Sequents");
+			dlg.setInitialSelections(allProverSequents.toArray());
+			dlg.open();
+
+			allProverSequents.clear();
+			for (Object o : dlg.getResult()) {
+				allProverSequents.add((IPOSequent) o);
+			}
+
+			// combine selected reasoners / sequents to a list of tasks
 			List<ProverEvaluationTask> tasks = generateTasks(allProverSequents,
 					allReasoners);
 
 			evaluate(tasks);
-
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
