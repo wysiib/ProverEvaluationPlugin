@@ -60,7 +60,15 @@ public class ProverEvaluationTask {
 	}
 
 	public String getProverName() {
-		return tactic.toString();
+		String tacticName = tactic.toString();
+
+		int index = tacticName.lastIndexOf(".");
+		tacticName = tacticName.substring(index + 1, tacticName.length());
+
+		index = tacticName.lastIndexOf("@");
+		tacticName = tacticName.substring(0, index);
+
+		return tacticName;
 	}
 
 	public String getProofObligationName() {

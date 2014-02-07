@@ -39,7 +39,13 @@ public class ReasonersLabelProvider implements ILabelProvider {
 	@Override
 	public String getText(Object element) {
 		ITactic reasoner = (ITactic) element;
-		return reasoner.toString();
-	}
 
+		String tacticName = reasoner.toString();
+		int index = tacticName.lastIndexOf(".");
+		tacticName = tacticName.substring(index + 1, tacticName.length());
+		index = tacticName.lastIndexOf("@");
+		tacticName = tacticName.substring(0, index);
+
+		return tacticName;
+	}
 }
