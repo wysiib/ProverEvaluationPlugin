@@ -4,7 +4,7 @@ project.ext {
                           "http://rodin-b-sharp.sourceforge.net/updates",
                           "http://rodin-b-sharp.sourceforge.net/core-updates"]	
 
-	groupID = "de.prob.disprover"
+	groupID = "de.provereval"
 
 	// 	script properties:
 	//
