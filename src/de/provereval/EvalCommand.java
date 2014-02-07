@@ -71,11 +71,11 @@ public class EvalCommand extends AbstractHandler {
 		Map<String, List<ProverEvaluationTask>> grouped = new HashMap<String, List<ProverEvaluationTask>>();
 
 		for (ProverEvaluationTask task : tasks) {
-			String proverName = task.getProverName();
-			if (!grouped.containsKey(proverName)) {
-				grouped.put(proverName, new ArrayList<ProverEvaluationTask>());
+			String sequentName = task.getProofObligationName();
+			if (!grouped.containsKey(sequentName)) {
+				grouped.put(sequentName, new ArrayList<ProverEvaluationTask>());
 			}
-			grouped.get(proverName).add(task);
+			grouped.get(sequentName).add(task);
 		}
 
 		new ResultDialog(shell, grouped).open();
