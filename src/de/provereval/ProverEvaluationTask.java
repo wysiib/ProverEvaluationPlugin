@@ -58,4 +58,12 @@ public class ProverEvaluationTask {
 			status = TaskStatus.CRASHED;
 		}
 	}
+
+	public String getProverName() {
+		return tactic.toString();
+	}
+
+	public String getProofObligationName() {
+		return sequent.getElementName();
+	}
 }

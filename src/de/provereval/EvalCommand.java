@@ -14,15 +14,16 @@ import org.eventb.core.*;
 import org.eventb.core.seqprover.ITactic;
 import org.rodinp.core.*;
 
+import de.provereval.output.ResultDialog;
 import de.provereval.selectiondialogs.*;
 
 public class EvalCommand extends AbstractHandler {
+	Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+			.getShell();
+
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
-			Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getShell();
-
 			// get all reasoners and ask the user which ones to benchmark
 			List<ITactic> allReasoners = getAllReasoners();
 			ListSelectionDialog dlg = new ListSelectionDialog(shell,
@@ -57,11 +58,27 @@ public class EvalCommand extends AbstractHandler {
 					allReasoners);
 
 			evaluate(tasks);
+
+			show(tasks);
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	private void show(List<ProverEvaluationTask> tasks) {
+		Map<String, List<ProverEvaluationTask>> grouped = new HashMap<String, List<ProverEvaluationTask>>();
+
+		for (ProverEvaluationTask task : tasks) {
+			String proverName = task.getProverName();
+			if (!grouped.containsKey(proverName)) {
+				grouped.put(proverName, new ArrayList<ProverEvaluationTask>());
+			}
+			grouped.get(proverName).add(task);
+		}
+
+		new ResultDialog(shell, grouped).open();
 	}
 
 	private void evaluate(List<ProverEvaluationTask> tasks) {
