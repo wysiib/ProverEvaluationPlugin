@@ -1,4 +1,4 @@
-package de.provereval.selectiondialogs;
+package de.provereval.labelproviders;
 
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Image;
@@ -39,7 +39,10 @@ public class SequentsLabelProvider implements ILabelProvider {
 	@Override
 	public String getText(Object element) {
 		IPOSequent sequent = (IPOSequent) element;
-		return sequent.toString();
+		String projectName = sequent.getRodinProject().getElementName();
+
+		return projectName + ":" + sequent.getElementName();
+
 	}
 
 }

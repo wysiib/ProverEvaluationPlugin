@@ -6,7 +6,12 @@ import org.eventb.core.seqprover.*;
 import org.eventb.internal.core.seqprover.*;
 import org.rodinp.core.RodinDBException;
 
+import de.provereval.labelproviders.*;
+
 public class ProverEvaluationTask {
+	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
+	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
+
 	public enum TaskStatus {
 		PROVEN, NOT_PROVEN, CRASHED
 	};
@@ -61,18 +66,10 @@ public class ProverEvaluationTask {
 	}
 
 	public String getProverName() {
-		String tacticName = tactic.toString();
-
-		int index = tacticName.lastIndexOf(".");
-		tacticName = tacticName.substring(index + 1, tacticName.length());
-
-		index = tacticName.lastIndexOf("@");
-		tacticName = tacticName.substring(0, index);
-
-		return tacticName;
+		return rProvider.getText(tactic);
 	}
 
 	public String getProofObligationName() {
-		return sequent.getElementName();
+		return sProvider.getText(sequent);
 	}
 }

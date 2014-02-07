@@ -14,8 +14,8 @@ import org.eventb.core.*;
 import org.eventb.core.seqprover.ITactic;
 import org.rodinp.core.*;
 
+import de.provereval.labelproviders.*;
 import de.provereval.output.ResultDialog;
-import de.provereval.selectiondialogs.*;
 
 public class EvalCommand extends AbstractHandler {
 	Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()

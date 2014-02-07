@@ -1,4 +1,4 @@
-package de.provereval.selectiondialogs;
+package de.provereval.labelproviders;
 
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Image;
