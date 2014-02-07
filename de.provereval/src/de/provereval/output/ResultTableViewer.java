@@ -55,7 +55,7 @@ public class ResultTableViewer extends TableViewer {
 								if (task.getProverName().equals(
 										t.getProverName())) {
 									if (task.isProven()) {
-										return "proven";
+										return "\u2713";
 									} else {
 										return "-";
 									}
