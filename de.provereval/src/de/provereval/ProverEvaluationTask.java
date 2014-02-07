@@ -28,6 +28,7 @@ public class ProverEvaluationTask {
 		IProofComponent pc = pm.getProofComponent(poRoot);
 		IProofAttempt pa = pc.createProofAttempt(sequent.getElementName(),
 				"Translation in Prover Evaluation Plugin", null);
+
 		IProofTree proofTree = pa.getProofTree();
 
 		IProverSequent proverSequent = proofTree.getSequent();
@@ -48,7 +49,7 @@ public class ProverEvaluationTask {
 
 			tactic.apply(node, Util.getNullProofMonitor());
 
-			if (node.isClosed()) {
+			if (node.getConfidence() > IConfidence.REVIEWED_MAX) {
 				status = TaskStatus.PROVEN;
 			} else {
 				status = TaskStatus.NOT_PROVEN;
