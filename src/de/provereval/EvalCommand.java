@@ -50,7 +50,9 @@ public class EvalCommand extends AbstractHandler {
 						if (configurationElement.getAttribute("class")
 								.startsWith("org.eventb.core.seqprover")
 								|| configurationElement.getAttribute("class")
-										.startsWith("org.eventb.core.tests")) {
+										.startsWith("org.eventb.core.tests")
+								|| configurationElement.getAttribute("class")
+										.startsWith("org.eventb.theory")) {
 							break;
 						}
 						Object x = configurationElement
