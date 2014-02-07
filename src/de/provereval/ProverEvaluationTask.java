@@ -36,6 +36,10 @@ public class ProverEvaluationTask {
 		return proverSequent;
 	}
 
+	public boolean isProven() {
+		return status == TaskStatus.PROVEN;
+	}
+
 	@SuppressWarnings("restriction")
 	public void runTask() {
 		try {
