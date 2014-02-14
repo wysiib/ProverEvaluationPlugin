@@ -1,49 +1,56 @@
 package de.provereval.output;
 
 import java.io.*;
+import java.util.*;
 
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.swt.widgets.*;
+import de.provereval.ProverEvaluationTask;
 
 public class CSVExporter {
-	public static void exportToCSVFile(TableViewer viewer, String path) {
+	public static void exportToCSVFile(
+			Map<String, List<ProverEvaluationTask>> grouped, String path) {
 		Writer writer = null;
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(path)));
-			Table table = viewer.getTable();
 
-			final int[] columnOrder = table.getColumnOrder();
-			for (int i = 0; i < columnOrder.length; i++) {
-				int columnIndex = columnOrder[i];
-				TableColumn tableColumn = table.getColumn(columnIndex);
+			// get a list of solvers
+			List<String> reasoners = new ArrayList<String>();
 
-				writer.write(tableColumn.getText());
-				if (i + 1 != columnOrder.length) {
+			Collection<List<ProverEvaluationTask>> values = grouped.values();
+			List<ProverEvaluationTask> first = values.iterator().next();
+			for (ProverEvaluationTask task : first) {
+				reasoners.add(task.getProverName());
+			}
+
+			// header of csv file
+			writer.write("Sequent,");
+			for (int i = 0; i < reasoners.size(); i++) {
+				writer.write(reasoners.get(i));
+				if (i + 1 < reasoners.size()) {
 					writer.write(",");
 				}
 			}
 			writer.write("\n");
 
-			final int itemCount = table.getItemCount();
-			for (int i = 0; i < itemCount; i++) {
-				TableItem item = table.getItem(i);
+			for (String key : grouped.keySet()) {
+				writer.write(key + ",");
 
-				for (int j = 0; j < columnOrder.length; j++) {
-					int columnIndex = columnOrder[j];
-
-					if ("\u2713".equals(item.getText(columnIndex))) {
+				for (int i = 0; i < reasoners.size(); i++) {
+					ProverEvaluationTask task = getTask(reasoners.get(i),
+							grouped.get(key));
+					if (task.isProven()) {
 						writer.write("proven");
 					} else {
-						writer.write(item.getText(columnIndex));
+						writer.write("x");
 					}
 
-					if (j + 1 != columnOrder.length) {
+					if (i + 1 < reasoners.size()) {
 						writer.write(",");
 					}
 				}
 				writer.write("\n");
 			}
+
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		} finally {
@@ -55,4 +62,13 @@ public class CSVExporter {
 
 	}
 
+	private static ProverEvaluationTask getTask(String reasoner,
+			List<ProverEvaluationTask> list) {
+		for (ProverEvaluationTask t : list) {
+			if (t.getProverName().equals(reasoner)) {
+				return t;
+			}
+		}
+		return null;
+	}
 }

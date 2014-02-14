@@ -13,7 +13,6 @@ import de.provereval.ProverEvaluationTask;
 public class ResultDialog extends Dialog {
 	private final Shell parentShell;
 	private final Map<String, List<ProverEvaluationTask>> grouped;
-	private ResultTableViewer viewer;
 
 	public ResultDialog(final Shell parentShell,
 			Map<String, List<ProverEvaluationTask>> grouped) {
@@ -26,7 +25,7 @@ public class ResultDialog extends Dialog {
 	protected Control createDialogArea(final Composite parent) {
 		final Composite body = (Composite) super.createDialogArea(parent);
 
-		viewer = new ResultTableViewer(body, grouped);
+		new ResultTableViewer(body, grouped);
 
 		final Button exportButton = new Button(body, SWT.PUSH);
 		exportButton.setText("Export to CSV");
@@ -46,7 +45,7 @@ public class ResultDialog extends Dialog {
 		String[] filterExt = { "*.csv" };
 		fd.setFilterExtensions(filterExt);
 		String path = fd.open();
-		CSVExporter.exportToCSVFile(viewer, path);
+		CSVExporter.exportToCSVFile(grouped, path);
 	}
 
 }

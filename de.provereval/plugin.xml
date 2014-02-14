@@ -31,5 +31,17 @@
             commandId="de.provereval.eval">
       </handler>
    </extension>
+   <extension
+         id="id1"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="de.provereval.Headless">
+         </run>
+      </application>
+   </extension>
 
 </plugin>

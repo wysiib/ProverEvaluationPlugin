@@ -15,42 +15,63 @@ import org.eventb.core.seqprover.ITactic;
 import org.rodinp.core.*;
 
 import de.provereval.labelproviders.*;
-import de.provereval.output.ResultDialog;
+import de.provereval.output.*;
 
 public class EvalCommand extends AbstractHandler {
-	Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-			.getShell();
+	Shell shell;
+	private boolean headless;
+
+	public EvalCommand() {
+		this(false);
+	}
+
+	public EvalCommand(boolean skipDialogs) {
+		super();
+		if (skipDialogs) {
+			shell = null;
+			headless = true;
+		} else {
+			headless = false;
+			shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+					.getShell();
+		}
+	}
 
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
 			// get all reasoners and ask the user which ones to benchmark
 			List<ITactic> allReasoners = getAllReasoners();
-			ListSelectionDialog dlg = new ListSelectionDialog(shell,
-					allReasoners, new ArrayContentProvider(),
-					new ReasonersLabelProvider(),
-					"Select the reasoners you want to apply:");
-			dlg.setTitle("Select Reasoners");
-			dlg.setInitialSelections(allReasoners.toArray());
-			dlg.open();
+			if (!headless) {
+				ListSelectionDialog dlg = new ListSelectionDialog(shell,
+						allReasoners, new ArrayContentProvider(),
+						new ReasonersLabelProvider(),
+						"Select the reasoners you want to apply:");
+				dlg.setTitle("Select Reasoners");
+				dlg.setInitialSelections(allReasoners.toArray());
+				dlg.open();
 
-			allReasoners.clear();
-			for (Object o : dlg.getResult()) {
-				allReasoners.add((ITactic) o);
+				allReasoners.clear();
+				for (Object o : dlg.getResult()) {
+					allReasoners.add((ITactic) o);
+				}
 			}
 
 			// same for sequents
 			List<IPOSequent> allProverSequents = getAllProverSequents();
-			dlg = new ListSelectionDialog(shell, allProverSequents,
-					new ArrayContentProvider(), new SequentsLabelProvider(),
-					"Select the sequents you want the reasoners to be applied to:");
-			dlg.setTitle("Select Sequents");
-			dlg.setInitialSelections(allProverSequents.toArray());
-			dlg.open();
+			if (!headless) {
+				ListSelectionDialog dlg = new ListSelectionDialog(shell,
+						allProverSequents, new ArrayContentProvider(),
+						new SequentsLabelProvider(),
+						"Select the sequents you want the reasoners to be applied to:");
+				dlg.setTitle("Select Sequents");
+				dlg.setInitialSelections(allProverSequents.toArray());
+				dlg.open();
 
-			allProverSequents.clear();
-			for (Object o : dlg.getResult()) {
-				allProverSequents.add((IPOSequent) o);
+				allProverSequents.clear();
+				for (Object o : dlg.getResult()) {
+					allProverSequents.add((IPOSequent) o);
+				}
 			}
 
 			// combine selected reasoners / sequents to a list of tasks
@@ -59,7 +80,14 @@ public class EvalCommand extends AbstractHandler {
 
 			evaluate(tasks);
 
-			show(tasks);
+			Map<String, List<ProverEvaluationTask>> grouped = groupTasksBySequent(tasks);
+
+			if (headless) {
+				String[] applicationArgs = Platform.getApplicationArgs();
+				CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
+			} else {
+				new ResultDialog(shell, grouped);
+			}
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -67,7 +95,8 @@ public class EvalCommand extends AbstractHandler {
 		return null;
 	}
 
-	private void show(List<ProverEvaluationTask> tasks) {
+	private Map<String, List<ProverEvaluationTask>> groupTasksBySequent(
+			List<ProverEvaluationTask> tasks) {
 		Map<String, List<ProverEvaluationTask>> grouped = new HashMap<String, List<ProverEvaluationTask>>();
 
 		for (ProverEvaluationTask task : tasks) {
@@ -78,7 +107,7 @@ public class EvalCommand extends AbstractHandler {
 			grouped.get(sequentName).add(task);
 		}
 
-		new ResultDialog(shell, grouped).open();
+		return grouped;
 	}
 
 	private void evaluate(List<ProverEvaluationTask> tasks) {
