@@ -8,6 +8,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.*;
 
 import de.provereval.ProverEvaluationTask;
+import de.provereval.labelproviders.ResultsLabelProvider;
 
 public class ResultTableViewer extends TableViewer {
 	private final Map<String, List<ProverEvaluationTask>> tasks;
@@ -45,26 +46,7 @@ public class ResultTableViewer extends TableViewer {
 		List<ProverEvaluationTask> first = values.iterator().next();
 		for (final ProverEvaluationTask t : first) {
 			createTableViewerColumn(t.getProverName(), 200, 0)
-					.setLabelProvider(new ColumnLabelProvider() {
-						@SuppressWarnings("unchecked")
-						@Override
-						public String getText(Object element) {
-							List<ProverEvaluationTask> p = (List<ProverEvaluationTask>) element;
-
-							for (ProverEvaluationTask task : p) {
-								if (task.getProverName().equals(
-										t.getProverName())) {
-									if (task.isProven()) {
-										return "\u2713";
-									} else {
-										return "-";
-									}
-								}
-							}
-
-							return "No Result";
-						}
-					});
+					.setLabelProvider(new ResultsLabelProvider(t));
 		}
 
 	}
