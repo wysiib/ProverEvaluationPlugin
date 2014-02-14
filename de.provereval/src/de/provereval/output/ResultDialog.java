@@ -14,6 +14,7 @@ import de.provereval.ProverEvaluationTask;
 public class ResultDialog extends Dialog {
 	private final Shell parentShell;
 	private final Map<String, List<ProverEvaluationTask>> grouped;
+	private ResultTableViewer viewer;
 
 	public ResultDialog(final Shell parentShell,
 			Map<String, List<ProverEvaluationTask>> grouped) {
@@ -26,7 +27,7 @@ public class ResultDialog extends Dialog {
 	protected Control createDialogArea(final Composite parent) {
 		final Composite body = (Composite) super.createDialogArea(parent);
 
-		final ResultTableViewer viewer = new ResultTableViewer(body, grouped);
+		viewer = new ResultTableViewer(body, grouped);
 
 		final Button exportButton = new Button(body, SWT.PUSH);
 		exportButton.setText("Export to CSV");
@@ -54,9 +55,41 @@ public class ResultDialog extends Dialog {
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(path)));
-			writer.write("Something");
+			Table table = viewer.getTable();
+
+			final int[] columnOrder = table.getColumnOrder();
+			for (int i = 0; i < columnOrder.length; i++) {
+				int columnIndex = columnOrder[i];
+				TableColumn tableColumn = table.getColumn(columnIndex);
+
+				writer.write(tableColumn.getText());
+				if (i + 1 != columnOrder.length) {
+					writer.write(",");
+				}
+			}
+			writer.write("\n");
+
+			final int itemCount = table.getItemCount();
+			for (int i = 0; i < itemCount; i++) {
+				TableItem item = table.getItem(i);
+
+				for (int j = 0; j < columnOrder.length; j++) {
+					int columnIndex = columnOrder[j];
+
+					if ("\u2713".equals(item.getText(columnIndex))) {
+						writer.write("proven");
+					} else {
+						writer.write(item.getText(columnIndex));
+					}
+
+					if (j + 1 != columnOrder.length) {
+						writer.write(",");
+					}
+				}
+				writer.write("\n");
+			}
 		} catch (IOException ex) {
-			// report
+			ex.printStackTrace();
 		} finally {
 			try {
 				writer.close();
