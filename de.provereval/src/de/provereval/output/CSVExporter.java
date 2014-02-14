@@ -33,7 +33,7 @@ public class CSVExporter {
 			writer.write("\n");
 
 			for (String key : grouped.keySet()) {
-				writer.write(key + ",");
+				writer.write(key.replace("\n", "") + ",");
 
 				for (int i = 0; i < reasoners.size(); i++) {
 					ProverEvaluationTask task = getTask(reasoners.get(i),
