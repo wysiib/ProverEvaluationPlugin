@@ -86,7 +86,7 @@ public class EvalCommand extends AbstractHandler {
 				String[] applicationArgs = Platform.getApplicationArgs();
 				CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
 			} else {
-				new ResultDialog(shell, grouped);
+				new ResultDialog(shell, grouped).open();
 			}
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
