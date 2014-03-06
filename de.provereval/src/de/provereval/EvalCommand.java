@@ -16,9 +16,9 @@ import org.eventb.core.*;
 import org.eventb.core.seqprover.ITactic;
 import org.rodinp.core.*;
 
-import de.provereval.labelproviders.*;
-import de.provereval.output.*;
-import dialogs.ResultDialog;
+import de.provereval.labelproviders.ReasonersLabelProvider;
+import de.provereval.output.CSVExporter;
+import dialogs.*;
 
 public class EvalCommand extends AbstractHandler {
 	Shell shell;
@@ -63,18 +63,11 @@ public class EvalCommand extends AbstractHandler {
 			// same for sequents
 			List<IPOSequent> allProverSequents = getAllProverSequents();
 			if (!headless) {
-				ListSelectionDialog dlg = new ListSelectionDialog(shell,
-						allProverSequents, new ArrayContentProvider(),
-						new SequentsLabelProvider(),
-						"Select the sequents you want the reasoners to be applied to:");
-				dlg.setTitle("Select Sequents");
-				dlg.setInitialSelections(allProverSequents.toArray());
-				dlg.open();
-
+				SequentSelectionDialog ssDiag = new SequentSelectionDialog(
+						shell, allProverSequents);
+				ssDiag.open();
 				allProverSequents.clear();
-				for (Object o : dlg.getResult()) {
-					allProverSequents.add((IPOSequent) o);
-				}
+				allProverSequents.addAll(ssDiag.getSelectedProverSequents());
 			}
 
 			// combine selected reasoners / sequents to a list of tasks
