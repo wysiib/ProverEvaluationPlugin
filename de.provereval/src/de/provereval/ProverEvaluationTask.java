@@ -1,5 +1,7 @@
 package de.provereval;
 
+import java.util.*;
+
 import org.eventb.core.*;
 import org.eventb.core.pm.*;
 import org.eventb.core.seqprover.*;
@@ -54,10 +56,21 @@ public class ProverEvaluationTask {
 
 			tactic.apply(node, Util.getNullProofMonitor());
 
-			if (node.getConfidence() > IConfidence.REVIEWED_MAX) {
-				status = TaskStatus.PROVEN;
-			} else {
-				status = TaskStatus.NOT_PROVEN;
+			// check for all child nodes if they are discharged
+			status = TaskStatus.PROVEN;
+
+			Stack<ProofTreeNode> childNodes = new Stack<ProofTreeNode>();
+			childNodes.add(node);
+
+			while (!childNodes.isEmpty()) {
+				// add all sub-nodes to stack
+				ProofTreeNode cur = childNodes.pop();
+				childNodes.addAll(Arrays.asList(cur.getChildNodes()));
+
+				if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
+					status = TaskStatus.NOT_PROVEN;
+					break;
+				}
 			}
 		} catch (Exception e) {
 			// prover crashed somehow
