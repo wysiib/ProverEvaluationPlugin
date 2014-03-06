@@ -19,6 +19,14 @@ public class ResultTableViewer extends TableViewer {
 		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.FULL_SELECTION | SWT.BORDER);
 
+		GridData gd = new GridData();
+		gd.horizontalAlignment = SWT.FILL;
+		gd.verticalAlignment = SWT.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.grabExcessVerticalSpace = true;
+
+		getControl().setLayoutData(gd);
+
 		this.tasks = grouped;
 
 		createColumns();
