@@ -12,6 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eventb.core.seqprover,
  de.prob.eventb.disprover.core,
  org.eclipse.ui.workbench,
- org.eclipse.osgi
+ org.eclipse.osgi,
+ org.eclipse.core.jobs,
+ org.eclipse.jface
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

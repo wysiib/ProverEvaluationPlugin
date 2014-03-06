@@ -1,11 +1,13 @@
 package de.provereval;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import org.eclipse.core.commands.*;
 import org.eclipse.core.resources.*;
 import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -78,15 +80,18 @@ public class EvalCommand extends AbstractHandler {
 			List<ProverEvaluationTask> tasks = generateTasks(allProverSequents,
 					allReasoners);
 
-			evaluate(tasks);
+			boolean canceled = evaluate(tasks);
 
-			Map<String, List<ProverEvaluationTask>> grouped = groupTasksBySequent(tasks);
+			if (!canceled) {
 
-			if (headless) {
-				String[] applicationArgs = Platform.getApplicationArgs();
-				CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
-			} else {
-				new ResultDialog(shell, grouped).open();
+				Map<String, List<ProverEvaluationTask>> grouped = groupTasksBySequent(tasks);
+
+				if (headless) {
+					String[] applicationArgs = Platform.getApplicationArgs();
+					CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
+				} else {
+					new ResultDialog(shell, grouped).open();
+				}
 			}
 		} catch (RodinDBException e) {
 			// TODO Auto-generated catch block
@@ -110,10 +115,19 @@ public class EvalCommand extends AbstractHandler {
 		return grouped;
 	}
 
-	private void evaluate(List<ProverEvaluationTask> tasks) {
-		for (ProverEvaluationTask task : tasks) {
-			task.runTask();
+	private boolean evaluate(final List<ProverEvaluationTask> tasks) {
+		SolverRunnable runnable = new SolverRunnable(tasks);
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
+		try {
+			dialog.run(true, true, runnable);
+		} catch (InvocationTargetException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
+		return runnable.isCanceled();
 	}
 
 	private List<ITactic> getAllReasoners() {
