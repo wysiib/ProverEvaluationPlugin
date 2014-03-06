@@ -50,7 +50,7 @@ public class ResultTableViewer extends TableViewer {
 
 	private void createColumns() {
 		TableViewerColumn pos = createTableViewerColumn("Proof Obligation",
-				200, 0);
+				400, 0);
 		pos.setLabelProvider(new ColumnLabelProvider() {
 			@SuppressWarnings("unchecked")
 			@Override

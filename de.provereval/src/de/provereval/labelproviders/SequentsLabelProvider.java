@@ -40,8 +40,10 @@ public class SequentsLabelProvider implements ILabelProvider {
 	public String getText(Object element) {
 		IPOSequent sequent = (IPOSequent) element;
 		String projectName = sequent.getRodinProject().getElementName();
+		String fileName = sequent.getRoot().getResource().getName()
+				.replace(".bpo", "");
 
-		return projectName + ":" + sequent.getElementName();
+		return projectName + ":" + fileName + ":" + sequent.getElementName();
 
 	}
 
