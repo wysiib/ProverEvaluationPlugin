@@ -18,9 +18,9 @@ public class ResultsLabelProvider extends ColumnLabelProvider {
 	public String getText(Object element) {
 		List<ProverEvaluationTask> p = (List<ProverEvaluationTask>) element;
 
-		for (ProverEvaluationTask task : p) {
-			if (task.getProverName().equals(task.getProverName())) {
-				if (task.isProven()) {
+		for (ProverEvaluationTask candidate : p) {
+			if (candidate.getProverName().equals(task.getProverName())) {
+				if (candidate.isProven()) {
 					return "\u2713";
 				} else {
 					return "-";
