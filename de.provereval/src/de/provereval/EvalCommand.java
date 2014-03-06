@@ -18,6 +18,7 @@ import org.rodinp.core.*;
 
 import de.provereval.labelproviders.*;
 import de.provereval.output.*;
+import dialogs.ResultDialog;
 
 public class EvalCommand extends AbstractHandler {
 	Shell shell;

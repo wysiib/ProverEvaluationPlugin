@@ -1,4 +1,4 @@
-package de.provereval.output;
+package dialogs;
 
 import java.util.List;
 

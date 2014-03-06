@@ -1,4 +1,4 @@
-package de.provereval.output;
+package dialogs;
 
 import java.util.*;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.widgets.*;
 
 import de.provereval.ProverEvaluationTask;
+import de.provereval.output.CSVExporter;
 
 public class ResultDialog extends Dialog {
 	private final Shell parentShell;

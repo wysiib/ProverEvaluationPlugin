@@ -1,4 +1,4 @@
-package de.provereval.output;
+package dialogs;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.*;
