@@ -7,10 +7,10 @@ import org.eclipse.jface.viewers.ColumnLabelProvider;
 import de.provereval.ProverEvaluationTask;
 
 public class ResultsLabelProvider extends ColumnLabelProvider {
-	ProverEvaluationTask task;
+	String name;
 
-	public ResultsLabelProvider(ProverEvaluationTask t) {
-		task = t;
+	public ResultsLabelProvider(String string) {
+		name = string;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -19,7 +19,7 @@ public class ResultsLabelProvider extends ColumnLabelProvider {
 		List<ProverEvaluationTask> p = (List<ProverEvaluationTask>) element;
 
 		for (ProverEvaluationTask candidate : p) {
-			if (candidate.getProverName().equals(task.getProverName())) {
+			if (candidate.getProverName().equals(name)) {
 				if (candidate.isProven()) {
 					return "\u2713";
 				} else {

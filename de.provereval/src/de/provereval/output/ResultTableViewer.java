@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 
 import de.provereval.ProverEvaluationTask;
@@ -12,6 +13,13 @@ import de.provereval.labelproviders.ResultsLabelProvider;
 
 public class ResultTableViewer extends TableViewer {
 	private final Map<String, List<ProverEvaluationTask>> tasks;
+
+	// mapping columns to provers -> used to sort, etc
+	private final Map<TableColumn, String> columnsAndSolvers;
+
+	public String getContentOfColumn(TableColumn t) {
+		return columnsAndSolvers.get(t);
+	}
 
 	public ResultTableViewer(Composite parent,
 			Map<String, List<ProverEvaluationTask>> grouped) {
@@ -28,6 +36,7 @@ public class ResultTableViewer extends TableViewer {
 		getControl().setLayoutData(gd);
 
 		this.tasks = grouped;
+		columnsAndSolvers = new HashMap<TableColumn, String>();
 
 		createColumns();
 
@@ -40,21 +49,25 @@ public class ResultTableViewer extends TableViewer {
 	}
 
 	private void createColumns() {
-		createTableViewerColumn("Proof Obligation", 200, 0).setLabelProvider(
-				new ColumnLabelProvider() {
-					@SuppressWarnings("unchecked")
-					@Override
-					public String getText(Object element) {
-						List<ProverEvaluationTask> p = (List<ProverEvaluationTask>) element;
-						return p.get(0).getProofObligationName();
-					}
-				});
+		TableViewerColumn pos = createTableViewerColumn("Proof Obligation",
+				200, 0);
+		pos.setLabelProvider(new ColumnLabelProvider() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public String getText(Object element) {
+				List<ProverEvaluationTask> p = (List<ProverEvaluationTask>) element;
+				return p.get(0).getProofObligationName();
+			}
+		});
+		columnsAndSolvers.put(pos.getColumn(), "pos");
 
 		Collection<List<ProverEvaluationTask>> values = tasks.values();
 		List<ProverEvaluationTask> first = values.iterator().next();
 		for (final ProverEvaluationTask t : first) {
-			createTableViewerColumn(t.getProverName(), 200, 0)
-					.setLabelProvider(new ResultsLabelProvider(t));
+			TableViewerColumn col = createTableViewerColumn(t.getProverName(),
+					200, 0);
+			col.setLabelProvider(new ResultsLabelProvider(t.getProverName()));
+			columnsAndSolvers.put(col.getColumn(), t.getProverName());
 		}
 
 	}
@@ -64,10 +77,14 @@ public class ResultTableViewer extends TableViewer {
 		final TableViewerColumn viewerColumn = new TableViewerColumn(this,
 				SWT.NONE);
 		final TableColumn column = viewerColumn.getColumn();
+
+		column.addListener(SWT.Selection, new SortListener(this));
+
 		column.setText(title);
 		column.setWidth(bound);
 		column.setResizable(true);
 		column.setMoveable(true);
+
 		return viewerColumn;
 	}
 
