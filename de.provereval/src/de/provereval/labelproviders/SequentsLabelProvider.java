@@ -38,6 +38,10 @@ public class SequentsLabelProvider implements ILabelProvider {
 
 	@Override
 	public String getText(Object element) {
+		if (element == null) {
+			return "";
+		}
+
 		IPOSequent sequent = (IPOSequent) element;
 		String projectName = sequent.getRodinProject().getElementName();
 		String fileName = sequent.getRoot().getResource().getName()
