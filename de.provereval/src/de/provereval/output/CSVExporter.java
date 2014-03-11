@@ -39,9 +39,9 @@ public class CSVExporter {
 					ProverEvaluationTask task = getTask(reasoners.get(i),
 							grouped.get(key));
 					if (task.isProven()) {
-						writer.write("proven");
+						writer.write("1");
 					} else {
-						writer.write("x");
+						writer.write("0");
 					}
 
 					if (i + 1 < reasoners.size()) {
