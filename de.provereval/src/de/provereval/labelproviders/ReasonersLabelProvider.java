@@ -46,6 +46,8 @@ public class ReasonersLabelProvider implements ILabelProvider {
 		index = tacticName.lastIndexOf("@");
 		tacticName = tacticName.substring(0, index);
 
+		tacticName = tacticName.replace("AutoTactics$", "");
+
 		return tacticName;
 	}
 }

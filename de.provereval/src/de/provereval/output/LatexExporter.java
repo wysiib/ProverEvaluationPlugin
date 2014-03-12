@@ -5,8 +5,8 @@ import java.util.*;
 
 import de.provereval.ProverEvaluationTask;
 
-public class CSVExporter {
-	public static void exportToCSVFile(
+public class LatexExporter {
+	public static void exportToLatexFile(
 			Map<String, List<ProverEvaluationTask>> grouped, String path) {
 		Writer writer = null;
 		try {
@@ -22,37 +22,58 @@ public class CSVExporter {
 				reasoners.add(task.getProverName());
 			}
 
-			// header of csv file
-			writer.write("Sequent,");
+			// header of latex file
+			writer.write("\\begin{table}[h]\n");
+			writer.write("\\begin{center}\n");
+			writer.write("\\begin{longtable}{|l|");
+			for (int i = 0; i < reasoners.size(); i++) {
+				writer.write("c|");
+			}
+			writer.write("}\n");
+
+			writer.write("Sequent & ");
 			for (int i = 0; i < reasoners.size(); i++) {
 				writer.write(reasoners.get(i));
 				if (i + 1 < reasoners.size()) {
-					writer.write(",");
+					writer.write(" & ");
 				}
 			}
-			writer.write("\n");
+			writer.write("\\\\ \\hline\n");
+
+			String curMachine = "";
 
 			List<String> keys = new ArrayList<String>(grouped.keySet());
 			Collections.sort(keys);
 
 			for (String key : keys) {
-				writer.write(key.replace("\n", "") + ",");
+				String machine = key.substring(0, key.indexOf(':'));
+				if (!machine.equals(curMachine)) {
+					curMachine = machine;
+					writer.write("\\multicolumn{" + (reasoners.size() + 1)
+							+ "}{|c|}{");
+					writer.write(curMachine + "} \\\\ \\hline\n");
+				}
+				writer.write(key.replace("\n", "")
+						.replace(curMachine + ":", "") + " & ");
 
 				for (int i = 0; i < reasoners.size(); i++) {
 					ProverEvaluationTask task = getTask(reasoners.get(i),
 							grouped.get(key));
+
 					if (task.isProven()) {
-						writer.write("1");
-					} else {
-						writer.write("0");
+						writer.write("\\checkmark");
 					}
 
 					if (i + 1 < reasoners.size()) {
-						writer.write(",");
+						writer.write(" & ");
 					}
 				}
-				writer.write("\n");
+				writer.write(" \\\\ \\hline\n");
 			}
+
+			writer.write("\\end{longtable}\n");
+			writer.write("\\end{center}\n");
+			writer.write("\\end{table}\n");
 
 		} catch (IOException ex) {
 			ex.printStackTrace();
@@ -63,6 +84,11 @@ public class CSVExporter {
 			}
 		}
 
+	}
+
+	private String escape(String input) {
+		String output = input.replace("_", "\\_");
+		return output.replace("$", "\\$");
 	}
 
 	private static ProverEvaluationTask getTask(String reasoner,
