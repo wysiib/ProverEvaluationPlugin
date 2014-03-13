@@ -14,6 +14,7 @@ import de.provereval.output.*;
 
 public class ResultDialog extends Dialog {
 	private final Shell parentShell;
+	private final FileDialog fd;
 	private final Map<String, List<ProverEvaluationTask>> grouped;
 
 	public ResultDialog(final Shell parentShell,
@@ -21,6 +22,8 @@ public class ResultDialog extends Dialog {
 		super(parentShell);
 
 		this.parentShell = parentShell;
+		fd = new FileDialog(parentShell, SWT.SAVE);
+
 		this.grouped = grouped;
 	}
 
@@ -54,7 +57,6 @@ public class ResultDialog extends Dialog {
 	}
 
 	private void exportToCSV(Composite parent) {
-		FileDialog fd = new FileDialog(parentShell, SWT.SAVE);
 		fd.setText("Export to CSV");
 		String[] filterExt = { "*.csv" };
 		fd.setFilterExtensions(filterExt);
@@ -63,7 +65,6 @@ public class ResultDialog extends Dialog {
 	}
 
 	private void exportToLatex(Composite parent) {
-		FileDialog fd = new FileDialog(parentShell, SWT.SAVE);
 		fd.setText("Export to LaTeX");
 		String[] filterExt = { "*.tex" };
 		fd.setFilterExtensions(filterExt);
