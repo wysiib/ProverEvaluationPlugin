@@ -2,7 +2,8 @@ package de.provereval.labelproviders;
 
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.graphics.Image;
-import org.eventb.core.seqprover.ITactic;
+import org.eventb.core.preferences.IPrefMapEntry;
+import org.eventb.core.seqprover.IAutoTacticRegistry.ITacticDescriptor;
 
 public class ReasonersLabelProvider implements ILabelProvider {
 
@@ -38,16 +39,7 @@ public class ReasonersLabelProvider implements ILabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		ITactic reasoner = (ITactic) element;
-
-		String tacticName = reasoner.toString();
-		int index = tacticName.lastIndexOf(".");
-		tacticName = tacticName.substring(index + 1, tacticName.length());
-		index = tacticName.lastIndexOf("@");
-		tacticName = tacticName.substring(0, index);
-
-		tacticName = tacticName.replace("AutoTactics$", "");
-
-		return tacticName;
+		IPrefMapEntry<ITacticDescriptor> tactic = (IPrefMapEntry<ITacticDescriptor>) element;
+		return tactic.getKey();
 	}
 }

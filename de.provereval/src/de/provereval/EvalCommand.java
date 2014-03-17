@@ -5,15 +5,17 @@ import java.util.*;
 
 import org.eclipse.core.commands.*;
 import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
-import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eventb.core.*;
-import org.eventb.core.seqprover.ITactic;
+import org.eventb.core.preferences.*;
+import org.eventb.core.preferences.autotactics.TacticPreferenceFactory;
+import org.eventb.core.seqprover.IAutoTacticRegistry.ITacticDescriptor;
 import org.rodinp.core.*;
 
 import de.provereval.labelproviders.ReasonersLabelProvider;
@@ -44,7 +46,7 @@ public class EvalCommand extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {
 			// get all reasoners and ask the user which ones to benchmark
-			List<ITactic> allReasoners = getAllReasoners();
+			List<IPrefMapEntry<ITacticDescriptor>> allReasoners = getAllTactics();
 			if (!headless) {
 				ListSelectionDialog dlg = new ListSelectionDialog(shell,
 						allReasoners, new ArrayContentProvider(),
@@ -56,7 +58,7 @@ public class EvalCommand extends AbstractHandler {
 
 				allReasoners.clear();
 				for (Object o : dlg.getResult()) {
-					allReasoners.add((ITactic) o);
+					allReasoners.add((IPrefMapEntry<ITacticDescriptor>) o);
 				}
 			}
 
@@ -124,53 +126,27 @@ public class EvalCommand extends AbstractHandler {
 		return runnable.isCanceled();
 	}
 
-	private List<ITactic> getAllReasoners() {
-		List<ITactic> reasoners = new ArrayList<ITactic>();
+	private List<IPrefMapEntry<ITacticDescriptor>> getAllTactics() {
+		IPreferencesService ps = Platform.getPreferencesService();
+		String string = ps.getString("org.eventb.ui", "Tactics Map",
+				"nix nada nothing", null);
+		System.out.println(string);
 
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = registry
-				.getExtensionPoint("org.eventb.core.seqprover.autoTactics");
-		for (IExtension extension : extensionPoint.getExtensions()) {
-			for (IConfigurationElement configurationElement : extension
-					.getConfigurationElements()) {
+		CachedPreferenceMap<ITacticDescriptor> preferenceMap = TacticPreferenceFactory
+				.makeTacticPreferenceMap();
+		preferenceMap.inject(string);
 
-				if ("autoTactic".equals(configurationElement.getName())) {
-					try {
-						if (configurationElement.getAttribute("class")
-								.startsWith("org.eventb.core.seqprover")
-								|| configurationElement.getAttribute("class")
-										.startsWith("org.eventb.core.tests")
-								|| configurationElement.getAttribute("class")
-										.startsWith("org.eventb.theory")) {
-							break;
-						}
-						Object x = configurationElement
-								.createExecutableExtension("class");
-
-						if (x instanceof ITactic) {
-							reasoners.add((ITactic) x);
-						}
-
-					} catch (final CoreException e) {
-						// this happens for some incomplete reasoners that can
-						// not be instantiated
-					}
-
-				}
-
-			}
-
-		}
-		return reasoners;
+		return preferenceMap.getEntries();
 	}
 
 	private List<ProverEvaluationTask> generateTasks(
-			List<IPOSequent> allProverSequents, List<ITactic> allReasoners)
+			List<IPOSequent> allProverSequents,
+			List<IPrefMapEntry<ITacticDescriptor>> allReasoners)
 			throws RodinDBException {
 		List<ProverEvaluationTask> tasks = new ArrayList<ProverEvaluationTask>();
 
 		for (IPOSequent sequent : allProverSequents) {
-			for (ITactic reasoner : allReasoners) {
+			for (IPrefMapEntry<ITacticDescriptor> reasoner : allReasoners) {
 				tasks.add(new ProverEvaluationTask(reasoner, sequent));
 			}
 		}

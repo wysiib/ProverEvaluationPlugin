@@ -4,6 +4,8 @@ import java.util.*;
 
 import org.eventb.core.*;
 import org.eventb.core.pm.*;
+import org.eventb.core.preferences.IPrefMapEntry;
+import org.eventb.core.seqprover.IAutoTacticRegistry.ITacticDescriptor;
 import org.eventb.core.seqprover.*;
 import org.eventb.internal.core.seqprover.*;
 import org.rodinp.core.RodinDBException;
@@ -19,12 +21,13 @@ public class ProverEvaluationTask {
 	};
 
 	private TaskStatus status;
-	private final ITactic tactic;
+	private final IPrefMapEntry<ITacticDescriptor> tactic;
 	private final IPOSequent sequent;
 
-	public ProverEvaluationTask(ITactic tactic, IPOSequent sequent) {
+	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner,
+			IPOSequent sequent) {
 		super();
-		this.tactic = tactic;
+		this.tactic = reasoner;
 		this.sequent = sequent;
 	}
 
@@ -54,7 +57,10 @@ public class ProverEvaluationTask {
 			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
 					.getRoot();
 
-			tactic.apply(node, Util.getNullProofMonitor());
+			ITacticDescriptor descriptor = tactic.getValue();
+			ITactic instance = descriptor.getTacticInstance();
+
+			instance.apply(node, Util.getNullProofMonitor());
 
 			// check for all child nodes if they are discharged
 			status = TaskStatus.PROVEN;

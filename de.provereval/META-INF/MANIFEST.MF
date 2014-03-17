@@ -17,3 +17,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Import-Package: org.eventb.internal.ui.preferences.tactics,
+ org.eventb.ui
