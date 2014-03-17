@@ -22,10 +22,11 @@ public class SolverRunnable implements IRunnableWithProgress {
 	public void run(IProgressMonitor monitor) throws InvocationTargetException,
 			InterruptedException {
 		monitor.beginTask("Running Provers", tasks.size());
-		for (ProverEvaluationTask task : tasks) {
+		for (int i = 0; i < tasks.size(); i++) {
+			ProverEvaluationTask task = tasks.get(i);
 			task.runTask();
 			monitor.worked(1);
-
+			monitor.setTaskName("Proof Obligation " + i + " of " + tasks.size());
 			if (monitor.isCanceled()) {
 				canceled = true;
 				monitor.done();
