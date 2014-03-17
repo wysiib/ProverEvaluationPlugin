@@ -26,6 +26,8 @@ public class CSVExporter {
 			writer.write("Sequent,");
 			for (int i = 0; i < reasoners.size(); i++) {
 				writer.write(reasoners.get(i));
+				writer.write(",");
+				writer.write(reasoners.get(i) + "_Time");
 				if (i + 1 < reasoners.size()) {
 					writer.write(",");
 				}
@@ -46,6 +48,8 @@ public class CSVExporter {
 					} else {
 						writer.write("0");
 					}
+					writer.write(",");
+					writer.write(Long.toString(task.getTook()));
 
 					if (i + 1 < reasoners.size()) {
 						writer.write(",");

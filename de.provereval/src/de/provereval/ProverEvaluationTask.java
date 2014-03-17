@@ -21,6 +21,7 @@ public class ProverEvaluationTask {
 	};
 
 	private TaskStatus status;
+	private long took;
 	private final IPrefMapEntry<ITacticDescriptor> tactic;
 	private final IPOSequent sequent;
 
@@ -51,6 +52,10 @@ public class ProverEvaluationTask {
 		return status == TaskStatus.PROVEN;
 	}
 
+	public long getTook() {
+		return took;
+	}
+
 	@SuppressWarnings("restriction")
 	public void runTask() {
 		try {
@@ -60,7 +65,9 @@ public class ProverEvaluationTask {
 			ITacticDescriptor descriptor = tactic.getValue();
 			ITactic instance = descriptor.getTacticInstance();
 
+			long start = System.currentTimeMillis();
 			instance.apply(node, Util.getNullProofMonitor());
+			took = System.currentTimeMillis() - start;
 
 			// check for all child nodes if they are discharged
 			status = TaskStatus.PROVEN;
