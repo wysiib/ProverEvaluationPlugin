@@ -1,10 +1,17 @@
 package de.provereval;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.eclipse.core.commands.*;
-import org.eclipse.core.resources.*;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -12,15 +19,23 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
-import org.eventb.core.*;
-import org.eventb.core.preferences.*;
+import org.eventb.core.IPORoot;
+import org.eventb.core.IPOSequent;
+import org.eventb.core.preferences.CachedPreferenceMap;
+import org.eventb.core.preferences.IPrefMapEntry;
 import org.eventb.core.preferences.autotactics.TacticPreferenceFactory;
-import org.eventb.core.seqprover.IAutoTacticRegistry.ITacticDescriptor;
-import org.rodinp.core.*;
+import org.eventb.core.seqprover.ITacticDescriptor;
+import org.rodinp.core.IRodinDB;
+import org.rodinp.core.IRodinElement;
+import org.rodinp.core.IRodinFile;
+import org.rodinp.core.IRodinProject;
+import org.rodinp.core.RodinCore;
+import org.rodinp.core.RodinDBException;
 
 import de.provereval.labelproviders.ReasonersLabelProvider;
 import de.provereval.output.CSVExporter;
-import dialogs.*;
+import dialogs.ResultDialog;
+import dialogs.SequentSelectionDialog;
 
 public class EvalCommand extends AbstractHandler {
 	Shell shell;
@@ -42,6 +57,7 @@ public class EvalCommand extends AbstractHandler {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		try {

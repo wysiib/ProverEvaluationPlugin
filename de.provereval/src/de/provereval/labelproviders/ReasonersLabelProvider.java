@@ -1,9 +1,10 @@
 package de.provereval.labelproviders;
 
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eventb.core.preferences.IPrefMapEntry;
-import org.eventb.core.seqprover.IAutoTacticRegistry.ITacticDescriptor;
+import org.eventb.core.seqprover.ITacticDescriptor;
 
 public class ReasonersLabelProvider implements ILabelProvider {
 
@@ -37,6 +38,7 @@ public class ReasonersLabelProvider implements ILabelProvider {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public String getText(Object element) {
 		IPrefMapEntry<ITacticDescriptor> tactic = (IPrefMapEntry<ITacticDescriptor>) element;

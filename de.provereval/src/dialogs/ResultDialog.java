@@ -1,27 +1,30 @@
 package dialogs;
 
-import java.util.*;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 
 import de.provereval.ProverEvaluationTask;
-import de.provereval.output.*;
+import de.provereval.output.CSVExporter;
+import de.provereval.output.LatexExporter;
 
 public class ResultDialog extends Dialog {
-	private final Shell parentShell;
 	private final FileDialog fd;
 	private final Map<String, List<ProverEvaluationTask>> grouped;
 
 	public ResultDialog(final Shell parentShell,
 			Map<String, List<ProverEvaluationTask>> grouped) {
 		super(parentShell);
-
-		this.parentShell = parentShell;
 		fd = new FileDialog(parentShell, SWT.SAVE);
 
 		this.grouped = grouped;

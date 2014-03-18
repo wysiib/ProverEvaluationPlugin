@@ -1,16 +1,27 @@
 package de.provereval;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Stack;
 
-import org.eventb.core.*;
-import org.eventb.core.pm.*;
+import org.eventb.core.EventBPlugin;
+import org.eventb.core.IPORoot;
+import org.eventb.core.IPOSequent;
+import org.eventb.core.pm.IProofAttempt;
+import org.eventb.core.pm.IProofComponent;
+import org.eventb.core.pm.IProofManager;
 import org.eventb.core.preferences.IPrefMapEntry;
-import org.eventb.core.seqprover.IAutoTacticRegistry.ITacticDescriptor;
-import org.eventb.core.seqprover.*;
-import org.eventb.internal.core.seqprover.*;
+import org.eventb.core.seqprover.IConfidence;
+import org.eventb.core.seqprover.IProofTree;
+import org.eventb.core.seqprover.IProverSequent;
+import org.eventb.core.seqprover.ITactic;
+import org.eventb.core.seqprover.ITacticDescriptor;
+import org.eventb.internal.core.seqprover.ProofTree;
+import org.eventb.internal.core.seqprover.ProofTreeNode;
+import org.eventb.internal.core.seqprover.Util;
 import org.rodinp.core.RodinDBException;
 
-import de.provereval.labelproviders.*;
+import de.provereval.labelproviders.ReasonersLabelProvider;
+import de.provereval.labelproviders.SequentsLabelProvider;
 
 public class ProverEvaluationTask {
 	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
