@@ -144,7 +144,7 @@ public class EvalCommand extends AbstractHandler {
 
 	private List<IPrefMapEntry<ITacticDescriptor>> getAllTactics() {
 		IPreferencesService ps = Platform.getPreferencesService();
-		String string = ps.getString("org.eventb.ui", "Tactics Map",
+		String string = ps.getString("org.eventb.core", "Tactics Map",
 				"nix nada nothing", null);
 		System.out.println(string);
 
