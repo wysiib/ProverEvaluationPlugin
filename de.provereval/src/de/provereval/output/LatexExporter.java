@@ -1,7 +1,15 @@
 package de.provereval.output;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import de.provereval.ProverEvaluationTask;
 
@@ -33,7 +41,7 @@ public class LatexExporter {
 
 			writer.write("Sequent & ");
 			for (int i = 0; i < reasoners.size(); i++) {
-				writer.write(reasoners.get(i));
+				writer.write(escape(reasoners.get(i)));
 				if (i + 1 < reasoners.size()) {
 					writer.write(" & ");
 				}
@@ -51,10 +59,11 @@ public class LatexExporter {
 					curMachine = machine;
 					writer.write("\\multicolumn{" + (reasoners.size() + 1)
 							+ "}{|c|}{");
-					writer.write(curMachine + "} \\\\ \\hline\n");
+					writer.write(escape(curMachine) + "} \\\\ \\hline\n");
 				}
-				writer.write(key.replace("\n", "")
-						.replace(curMachine + ":", "") + " & ");
+				writer.write(escape(key.replace("\n", "").replace(
+						curMachine + ":", "")
+						+ " & "));
 
 				for (int i = 0; i < reasoners.size(); i++) {
 					ProverEvaluationTask task = getTask(reasoners.get(i),
@@ -86,7 +95,7 @@ public class LatexExporter {
 
 	}
 
-	private String escape(String input) {
+	private static String escape(String input) {
 		String output = input.replace("_", "\\_");
 		return output.replace("$", "\\$");
 	}
