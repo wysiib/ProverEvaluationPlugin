@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,7 +15,7 @@ import de.provereval.ProverEvaluationTask;
 public class LatexExporter {
 	public static void exportToLatexFile(
 			Map<String, List<ProverEvaluationTask>> grouped, String path) {
-		Writer writer = null;
+		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(path)));
@@ -31,13 +30,18 @@ public class LatexExporter {
 			}
 
 			// header of latex file
-			writer.write("\\begin{table}[h]\n");
-			writer.write("\\begin{center}\n");
+			writer.write("\\begin{table}[h]");
+			writer.newLine();
+
+			writer.write("\\begin{center}");
+			writer.newLine();
+
 			writer.write("\\begin{longtable}{|l|");
 			for (int i = 0; i < reasoners.size(); i++) {
 				writer.write("c|");
 			}
-			writer.write("}\n");
+			writer.write("}");
+			writer.newLine();
 
 			writer.write("Sequent & ");
 			for (int i = 0; i < reasoners.size(); i++) {
@@ -46,7 +50,8 @@ public class LatexExporter {
 					writer.write(" & ");
 				}
 			}
-			writer.write("\\\\ \\hline\n");
+			writer.write("\\\\ \\hline");
+			writer.newLine();
 
 			String curMachine = "";
 
@@ -59,7 +64,8 @@ public class LatexExporter {
 					curMachine = machine;
 					writer.write("\\multicolumn{" + (reasoners.size() + 1)
 							+ "}{|c|}{");
-					writer.write(escape(curMachine) + "} \\\\ \\hline\n");
+					writer.write(escape(curMachine) + "} \\\\ \\hline");
+					writer.newLine();
 				}
 				writer.write(escape(key.replace("\n", "").replace(
 						curMachine + ":", "")
@@ -77,12 +83,19 @@ public class LatexExporter {
 						writer.write(" & ");
 					}
 				}
-				writer.write(" \\\\ \\hline\n");
+				writer.write(" \\\\ \\hline");
+				writer.newLine();
+
 			}
 
-			writer.write("\\end{longtable}\n");
-			writer.write("\\end{center}\n");
-			writer.write("\\end{table}\n");
+			writer.write("\\end{longtable}");
+			writer.newLine();
+
+			writer.write("\\end{center}");
+			writer.newLine();
+
+			writer.write("\\end{table}");
+			writer.newLine();
 
 		} catch (IOException ex) {
 			ex.printStackTrace();

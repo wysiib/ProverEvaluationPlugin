@@ -1,14 +1,21 @@
 package de.provereval.output;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import de.provereval.ProverEvaluationTask;
 
 public class CSVExporter {
 	public static void exportToCSVFile(
 			Map<String, List<ProverEvaluationTask>> grouped, String path) {
-		Writer writer = null;
+		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(path)));
@@ -32,7 +39,7 @@ public class CSVExporter {
 					writer.write(",");
 				}
 			}
-			writer.write("\n");
+			writer.newLine();
 
 			List<String> keys = new ArrayList<String>(grouped.keySet());
 			Collections.sort(keys);
@@ -55,7 +62,7 @@ public class CSVExporter {
 						writer.write(",");
 					}
 				}
-				writer.write("\n");
+				writer.newLine();
 			}
 
 		} catch (IOException ex) {
