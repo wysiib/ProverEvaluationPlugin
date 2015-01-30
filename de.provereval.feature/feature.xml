@@ -108,12 +108,12 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.rodinp.core"/>
       <import plugin="org.eventb.core"/>
-      <import plugin="org.eventb.core.seqprover" version="3.0.0" match="equivalent"/>
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eventb.ui"/>
+      <import plugin="org.eventb.core.seqprover" version="3.0.0"/>
    </requires>
 
    <plugin
