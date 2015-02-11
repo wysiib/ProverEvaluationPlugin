@@ -92,11 +92,12 @@ public class EvalCommand extends AbstractHandler {
 			List<ProverEvaluationTask> tasks = generateTasks(allProverSequents,
 					allReasoners);
 
-			boolean canceled = evaluate(tasks);
+			SolverRunnable runnable = evaluate(tasks);
 
-			if (!canceled) {
+			if (!runnable.isCanceled()) {
 
-				Map<String, List<ProverEvaluationTask>> grouped = groupTasksBySequent(tasks);
+				Map<String, List<ProverEvaluationResult>> grouped = groupTasksBySequent(runnable
+						.getResults());
 
 				if (headless) {
 					String[] applicationArgs = Platform.getApplicationArgs();
@@ -112,22 +113,23 @@ public class EvalCommand extends AbstractHandler {
 		return null;
 	}
 
-	private Map<String, List<ProverEvaluationTask>> groupTasksBySequent(
-			List<ProverEvaluationTask> tasks) {
-		Map<String, List<ProverEvaluationTask>> grouped = new HashMap<String, List<ProverEvaluationTask>>();
+	private Map<String, List<ProverEvaluationResult>> groupTasksBySequent(
+			List<ProverEvaluationResult> results) {
+		Map<String, List<ProverEvaluationResult>> grouped = new HashMap<String, List<ProverEvaluationResult>>();
 
-		for (ProverEvaluationTask task : tasks) {
-			String sequentName = task.getProofObligationName();
+		for (ProverEvaluationResult result : results) {
+			String sequentName = result.getProofObligationName();
 			if (!grouped.containsKey(sequentName)) {
-				grouped.put(sequentName, new ArrayList<ProverEvaluationTask>());
+				grouped.put(sequentName,
+						new ArrayList<ProverEvaluationResult>());
 			}
-			grouped.get(sequentName).add(task);
+			grouped.get(sequentName).add(result);
 		}
 
 		return grouped;
 	}
 
-	private boolean evaluate(final List<ProverEvaluationTask> tasks) {
+	private SolverRunnable evaluate(final List<ProverEvaluationTask> tasks) {
 		SolverRunnable runnable = new SolverRunnable(tasks);
 		ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
 		try {
@@ -139,7 +141,7 @@ public class EvalCommand extends AbstractHandler {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		return runnable.isCanceled();
+		return runnable;
 	}
 
 	private List<IPrefMapEntry<ITacticDescriptor>> getAllTactics() {

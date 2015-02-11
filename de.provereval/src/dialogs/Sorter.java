@@ -2,11 +2,12 @@ package dialogs;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.TableColumn;
 
-import de.provereval.ProverEvaluationTask;
+import de.provereval.ProverEvaluationResult;
 
 public class Sorter extends ViewerSorter {
 	private final TableColumn column;
@@ -24,8 +25,8 @@ public class Sorter extends ViewerSorter {
 		int returnValue = 0;
 
 		ResultTableViewer tableViewer = (ResultTableViewer) viewer;
-		List<ProverEvaluationTask> tasks1 = (List<ProverEvaluationTask>) e1;
-		List<ProverEvaluationTask> tasks2 = (List<ProverEvaluationTask>) e2;
+		List<ProverEvaluationResult> tasks1 = (List<ProverEvaluationResult>) e1;
+		List<ProverEvaluationResult> tasks2 = (List<ProverEvaluationResult>) e2;
 
 		String content = tableViewer.getContentOfColumn(column);
 
@@ -35,8 +36,8 @@ public class Sorter extends ViewerSorter {
 					.compareTo(tasks2.get(0).getProofObligationName());
 		} else {
 			// find the belonging solver
-			ProverEvaluationTask task1 = findSolver(content, tasks1);
-			ProverEvaluationTask task2 = findSolver(content, tasks2);
+			ProverEvaluationResult task1 = findSolver(content, tasks1);
+			ProverEvaluationResult task2 = findSolver(content, tasks2);
 
 			returnValue = new Boolean(task1.isProven()).compareTo(new Boolean(
 					task2.isProven()));
@@ -48,9 +49,9 @@ public class Sorter extends ViewerSorter {
 		return returnValue;
 	}
 
-	private ProverEvaluationTask findSolver(String content,
-			List<ProverEvaluationTask> tasks) {
-		for (ProverEvaluationTask task : tasks) {
+	private ProverEvaluationResult findSolver(String content,
+			List<ProverEvaluationResult> tasks) {
+		for (ProverEvaluationResult task : tasks) {
 			if (task.getProverName().equals(content)) {
 				return task;
 			}

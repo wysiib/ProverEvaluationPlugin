@@ -2,6 +2,7 @@ package de.provereval;
 
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.concurrent.Callable;
 
 import org.eventb.core.EventBPlugin;
 import org.eventb.core.IPORoot;
@@ -20,19 +21,14 @@ import org.eventb.internal.core.seqprover.ProofTreeNode;
 import org.eventb.internal.core.seqprover.Util;
 import org.rodinp.core.RodinDBException;
 
+import de.provereval.ProverEvaluationResult.TaskStatus;
 import de.provereval.labelproviders.ReasonersLabelProvider;
 import de.provereval.labelproviders.SequentsLabelProvider;
 
-public class ProverEvaluationTask {
+@SuppressWarnings("restriction")
+public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
 	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
-
-	public enum TaskStatus {
-		PROVEN, NOT_PROVEN, CRASHED
-	};
-
-	private TaskStatus status;
-	private long took;
 	private final IPrefMapEntry<ITacticDescriptor> tactic;
 	private final IPOSequent sequent;
 
@@ -59,16 +55,10 @@ public class ProverEvaluationTask {
 		return proverSequent;
 	}
 
-	public boolean isProven() {
-		return status == TaskStatus.PROVEN;
-	}
-
-	public long getTook() {
-		return took;
-	}
-
-	@SuppressWarnings("restriction")
-	public void runTask() {
+	@Override
+	public ProverEvaluationResult call() throws Exception {
+		long took = 0;
+		ProverEvaluationResult.TaskStatus status;
 		try {
 			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
 					.getRoot();
@@ -100,13 +90,8 @@ public class ProverEvaluationTask {
 			// prover crashed somehow
 			status = TaskStatus.CRASHED;
 		}
-	}
 
-	public String getProverName() {
-		return rProvider.getText(tactic);
-	}
-
-	public String getProofObligationName() {
-		return sProvider.getText(sequent);
+		return new ProverEvaluationResult(rProvider.getText(tactic),
+				sProvider.getText(sequent), took, status);
 	}
 }

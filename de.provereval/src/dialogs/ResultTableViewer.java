@@ -1,18 +1,25 @@
 package dialogs;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 
-import de.provereval.ProverEvaluationTask;
+import de.provereval.ProverEvaluationResult;
 import de.provereval.labelproviders.ResultsLabelProvider;
 
 public class ResultTableViewer extends TableViewer {
-	private final Map<String, List<ProverEvaluationTask>> tasks;
+	private final Map<String, List<ProverEvaluationResult>> tasks;
 
 	// mapping columns to provers -> used to sort, etc
 	private final Map<TableColumn, String> columnsAndSolvers;
@@ -22,7 +29,7 @@ public class ResultTableViewer extends TableViewer {
 	}
 
 	public ResultTableViewer(Composite parent,
-			Map<String, List<ProverEvaluationTask>> grouped) {
+			Map<String, List<ProverEvaluationResult>> grouped) {
 		// define the TableViewer
 		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.FULL_SELECTION | SWT.BORDER);
@@ -55,15 +62,15 @@ public class ResultTableViewer extends TableViewer {
 			@SuppressWarnings("unchecked")
 			@Override
 			public String getText(Object element) {
-				List<ProverEvaluationTask> p = (List<ProverEvaluationTask>) element;
+				List<ProverEvaluationResult> p = (List<ProverEvaluationResult>) element;
 				return p.get(0).getProofObligationName();
 			}
 		});
 		columnsAndSolvers.put(pos.getColumn(), "pos");
 
-		Collection<List<ProverEvaluationTask>> values = tasks.values();
-		List<ProverEvaluationTask> first = values.iterator().next();
-		for (final ProverEvaluationTask t : first) {
+		Collection<List<ProverEvaluationResult>> values = tasks.values();
+		List<ProverEvaluationResult> first = values.iterator().next();
+		for (final ProverEvaluationResult t : first) {
 			TableViewerColumn col = createTableViewerColumn(t.getProverName(),
 					200, 0);
 			col.setLabelProvider(new ResultsLabelProvider(t.getProverName()));

@@ -10,11 +10,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import de.provereval.ProverEvaluationTask;
+import de.provereval.ProverEvaluationResult;
 
 public class LatexExporter {
 	public static void exportToLatexFile(
-			Map<String, List<ProverEvaluationTask>> grouped, String path) {
+			Map<String, List<ProverEvaluationResult>> grouped, String path) {
 		BufferedWriter writer = null;
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(
@@ -23,9 +23,9 @@ public class LatexExporter {
 			// get a list of solvers
 			List<String> reasoners = new ArrayList<String>();
 
-			Collection<List<ProverEvaluationTask>> values = grouped.values();
-			List<ProverEvaluationTask> first = values.iterator().next();
-			for (ProverEvaluationTask task : first) {
+			Collection<List<ProverEvaluationResult>> values = grouped.values();
+			List<ProverEvaluationResult> first = values.iterator().next();
+			for (ProverEvaluationResult task : first) {
 				reasoners.add(task.getProverName());
 			}
 
@@ -72,7 +72,7 @@ public class LatexExporter {
 						+ " & "));
 
 				for (int i = 0; i < reasoners.size(); i++) {
-					ProverEvaluationTask task = getTask(reasoners.get(i),
+					ProverEvaluationResult task = getResult(reasoners.get(i),
 							grouped.get(key));
 
 					if (task.isProven()) {
@@ -113,9 +113,9 @@ public class LatexExporter {
 		return output.replace("$", "\\$");
 	}
 
-	private static ProverEvaluationTask getTask(String reasoner,
-			List<ProverEvaluationTask> list) {
-		for (ProverEvaluationTask t : list) {
+	private static ProverEvaluationResult getResult(String reasoner,
+			List<ProverEvaluationResult> list) {
+		for (ProverEvaluationResult t : list) {
 			if (t.getProverName().equals(reasoner)) {
 				return t;
 			}

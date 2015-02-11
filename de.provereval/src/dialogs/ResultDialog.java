@@ -14,16 +14,16 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import de.provereval.ProverEvaluationTask;
+import de.provereval.ProverEvaluationResult;
 import de.provereval.output.CSVExporter;
 import de.provereval.output.LatexExporter;
 
 public class ResultDialog extends Dialog {
 	private final FileDialog fd;
-	private final Map<String, List<ProverEvaluationTask>> grouped;
+	private final Map<String, List<ProverEvaluationResult>> grouped;
 
 	public ResultDialog(final Shell parentShell,
-			Map<String, List<ProverEvaluationTask>> grouped) {
+			Map<String, List<ProverEvaluationResult>> grouped) {
 		super(parentShell);
 		fd = new FileDialog(parentShell, SWT.SAVE);
 
