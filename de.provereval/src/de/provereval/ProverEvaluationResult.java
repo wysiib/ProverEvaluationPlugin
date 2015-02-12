@@ -5,15 +5,17 @@ public class ProverEvaluationResult {
 		PROVEN, NOT_PROVEN, CRASHED
 	};
 
-	private TaskStatus status;
-	private long took;
+	private final TaskStatus status;
+	private final long took;
 	private final String sequentName;
 	private final String proverName;
 
 	public ProverEvaluationResult(String proverName, String sequentName,
-			long took2, TaskStatus status2) {
+			long took, TaskStatus status) {
 		this.proverName = proverName;
 		this.sequentName = sequentName;
+		this.took = took;
+		this.status = status;
 	}
 
 	public boolean isProven() {
