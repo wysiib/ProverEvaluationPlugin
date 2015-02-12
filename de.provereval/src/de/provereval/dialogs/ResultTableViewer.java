@@ -19,7 +19,7 @@ import de.provereval.ProverEvaluationResult;
 import de.provereval.labelproviders.ResultsLabelProvider;
 
 public class ResultTableViewer extends TableViewer {
-	private final Map<String, List<ProverEvaluationResult>> tasks;
+	private final Map<String, List<ProverEvaluationResult>> results;
 
 	// mapping columns to provers -> used to sort, etc
 	private final Map<TableColumn, String> columnsAndSolvers;
@@ -42,7 +42,7 @@ public class ResultTableViewer extends TableViewer {
 
 		getControl().setLayoutData(gd);
 
-		this.tasks = grouped;
+		results = grouped;
 		columnsAndSolvers = new HashMap<TableColumn, String>();
 
 		createColumns();
@@ -68,8 +68,9 @@ public class ResultTableViewer extends TableViewer {
 		});
 		columnsAndSolvers.put(pos.getColumn(), "pos");
 
-		Collection<List<ProverEvaluationResult>> values = tasks.values();
+		Collection<List<ProverEvaluationResult>> values = results.values();
 		List<ProverEvaluationResult> first = values.iterator().next();
+
 		for (final ProverEvaluationResult t : first) {
 			TableViewerColumn col = createTableViewerColumn(t.getProverName(),
 					200, 0);
