@@ -1,11 +1,18 @@
 package dialogs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 import org.eventb.core.IPOSequent;
 
@@ -96,7 +103,11 @@ public class SequentSelectionDialog extends FilteredItemsSelectionDialog {
 
 	public List<IPOSequent> getSelectedProverSequents() {
 		List<IPOSequent> selectedSequents = new ArrayList<IPOSequent>();
-		for (Object obj : getResult()) {
+		Object[] result = getResult();
+		if (result == null) {
+			return selectedSequents;
+		}
+		for (Object obj : result) {
 			selectedSequents.add((IPOSequent) obj);
 		}
 		return selectedSequents;
