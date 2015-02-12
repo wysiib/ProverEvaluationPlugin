@@ -51,7 +51,7 @@ public class SolverRunnable implements IRunnableWithProgress {
 			}
 
 			monitor.worked(1);
-			monitor.setTaskName("Proof Obligation " + i + 1 + " of "
+			monitor.setTaskName("Proof Obligation " + (i + 1) + " of "
 					+ tasks.size());
 
 			if (monitor.isCanceled()) {
