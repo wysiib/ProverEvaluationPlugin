@@ -2,9 +2,9 @@
 	Build Script can be executed via 'gradle install'
 	Build Script Dependencies can be downloaded via 'gradle collectDepenencies'
 	Executing the Build Script and download Dependencies can be executed via 'gradle completeInstall'
- 	For a complete classPath Refresh please execute 'gradle deleteFromClassPath setClassPath'	
+ 	For a complete classPath Refresh please execute 'gradle deleteFromClassPath setClassPath'
 	Pom Generation can be executed via gradle deploy
-	
+
 	If you have a product definition please add a buildProduct = true to your main build.gradle script
 
 */
@@ -15,7 +15,7 @@ apply plugin: 'base'
 import groovy.io.FileType
 project.ext.tychoVersion = "0.17.0"
 
-// defines a List with projects which will not be included in the tycho build 
+// defines a List with projects which will not be included in the tycho build
 try{
 	excludeFromTychoBuild = excludeFromTychoBuild
 }catch(MissingPropertyException e){
@@ -47,51 +47,51 @@ try{
 try{
 	dependencyFolder = dependencyFolder
 }catch(MissingPropertyException e){
-	project.ext.dependencyFolder = "lib/dependencies/"			
+	project.ext.dependencyFolder = "lib/dependencies/"
 }
 
 try{
 	groupID = groupID
 }catch(MissingPropertyException e){
-	
+
 	// workspace nach releng durchsuchen
 	def folderNames = []
 	def folders = []
 	println "folders:"
-	new File(workspacePath+".").listFiles().each{ dir ->  
+	new File(workspacePath+".").listFiles().each{ dir ->
 	    if( dir.isDirectory() ) folders <<  dir.getName()
-	}  
+	}
 
 	folders.each(){ it ->
 		it = (String)it.replaceFirst(/\.\//, "")
 		if( !( ( it ==~ /\..+/ ) || (it ==~ /.*.repository/) || (it ==~ /.*.parent/) ) ) folderNames << it			// subProjects eventuell unnötig settings.gradle datei stattdessen benutzen
 	}
 
-	
+
 	project.ext.groupID = "group"
 	for( int  i = 0; i < folderNames.size(); i++ ){
-		
+
 		if( folderNames[i] ==~ /.*\.[rR]eleng/ ){
 			groupID = folderNames[i]
 			groupID = groupID.replace( ".releng", "")
 			groupID = groupID.replace( ".Releng", "")
 		}
 	}
-	
+
 }
 
 // List which defines the features. By default it searches for projects with '.feature' at the end
 try{
 	features = features
 }catch(MissingPropertyException e){
-	
+
 	project.ext.features = []
 	for( int i = 0; i < subprojects.name.size(); i++ ){
 		if( subprojects.name[i] ==~ /.*\.[fF]eature/ ){
 			features.add( subprojects.name[i] )
 		}
 	}
-	
+
 }
 
 
@@ -124,7 +124,7 @@ try{
 
 try{
 	buildProduct = buildProduct
-	
+
 }catch(MissingPropertyException e){
 	project.ext.buildProduct = false
 }
@@ -169,22 +169,22 @@ def groupId(){
 */
 
 def addLibToCP(def project, def libPar){
-	
+
 	def filePar = new File(workspacePath+project+"/.classpath")
-	boolean notYetAdded = true	
+	boolean notYetAdded = true
 	filePar.eachLine{ line ->
 		def pattern = ".*${dependencyFolder}${libPar}.*"
 		if(line ==~ /${pattern}/){
 			notYetAdded = false
 		}
-		
+
 	}
 	if(notYetAdded){
-		File newCP = new File(workspacePath+project+'/.cp') 
+		File newCP = new File(workspacePath+project+'/.cp')
 		filePar.eachLine{ line ->
 
 			 if(line ==~ /.*<\/classpath>.*/){
-				
+
 				String entry = '\t<classpathentry exported="true" kind="lib" path="'+dependencyFolder+libPar+'"/>'+'\n</classpath>\n'
 				line = line.replaceAll(/<\/classpath>/, entry)
 				println project + " : "+ libPar +" added to classpath"
@@ -198,23 +198,23 @@ def addLibToCP(def project, def libPar){
 	}else{
 		println project + " : "+ libPar +" classpath entry already present"
 	}
-	
+
 }
 // Add certain Jar to Library
 
 
 def deleteLibFromCP(def project){
-	
+
 	def filePar = new File(workspacePath+project+"/.classpath")
 	boolean deleteCP = false
 	def newCP = new File(workspacePath+project+'/cp')
 	def pattern = ".*${dependencyFolder}[^<].*/>"
 
 	filePar.eachLine{ line ->
-	
+
 		if(line ==~ /\n(\ |\t)*/) line = line.replaceAll(/\n(\ |\t)*/, '')		// delete empty lines
 		if(line ==~ /${pattern}/){
-			deleteCP = true 
+			deleteCP = true
 			def pattern2 =  '(\\ |\\t)*<classpathentry exported="true" kind="lib" path="'+dependencyFolder+"[^<].*"+'"/>(\\ |\\t)*'
 			line = line.replaceAll(/${pattern2}/, '')
 			newCP << line
@@ -227,7 +227,7 @@ def deleteLibFromCP(def project){
 		newCP.delete()
 	}else{
 		filePar.delete()
-		newCP.renameTo(workspacePath+project+'/.classpath')	
+		newCP.renameTo(workspacePath+project+'/.classpath')
 		println workspacePath+project+'/.classpath' +"!"
 	}
 }
@@ -235,7 +235,7 @@ def deleteLibFromCP(def project){
 
 
 def addRunTimeLib( String libPar, String projectPar){
-	
+
 	def mf = new File(projectPar+"/META-INF/MANIFEST.MF")
 	def newMf = new File(projectPar+"/MF")
 	newMf.delete()
@@ -253,13 +253,13 @@ def addRunTimeLib( String libPar, String projectPar){
 				}
 			}
 		}
-		
+
 		newMf << line+"\n"
 	}
 	mf.delete()
 	newMf.renameTo(projectPar+"/META-INF/MANIFEST.MF")
-	
-	
+
+
 } // Adds a Library to the current Bundle-ClassPath of the Manifest file
 
 
@@ -280,7 +280,7 @@ def boolean checkForRunTimeLibs(String projectPar){
 } // checks for a Bundle-ClassPath section in the Manifest file
 
 
-def boolean checkRunTimeLib(String libPar, String projectPar){										// checks if lib is in RunTimeLibrary present and 
+def boolean checkRunTimeLib(String libPar, String projectPar){										// checks if lib is in RunTimeLibrary present and
 	def mf = new File(projectPar+"/META-INF/MANIFEST.MF")											// changes reference if necessary
 	def newMf = new File(projectPar+"/MF")
 	newMf.delete()
@@ -289,13 +289,13 @@ def boolean checkRunTimeLib(String libPar, String projectPar){										// check
 		mf.eachLine{ line ->
 			if(line ==~ /.*${libPar}.*/){
 				if( !( line ==~ /.*(\ |\t)*${dependencyFolder}${libPar}(\ |\t)*.*/ ) ){				// if lib is already referenced through another folder than lib/dependencies
-					line = line.replaceFirst( /[^\ \t]*${libPar}/, dependencyFolder+libPar ) 		// it's entry in the MF file will be overwritten to reference the lib from dependencyFolder	
+					line = line.replaceFirst( /[^\ \t]*${libPar}/, dependencyFolder+libPar ) 		// it's entry in the MF file will be overwritten to reference the lib from dependencyFolder
 					changed = true
 					println line
 				}
 				returnBool = true
 			}
-			
+
 			newMf << line+"\n"
 		}
 		if(changed){
@@ -305,28 +305,28 @@ def boolean checkRunTimeLib(String libPar, String projectPar){										// check
 			newMf.delete()
 		}
 		return returnBool
-	
+
 }// checks if lib is already present in Manifest file
 // if lib is present but is referenced from another folder than dependencyFolder the library from dependencyFolder will be referenced
 
 
 def deleteManifestClassPath(String projectPar){
-	
+
 	def mf = new File(projectPar+"/META-INF/MANIFEST.MF")
 	def newMf = new File(projectPar+"/MF")
 	boolean startDelete = false
 	newMf.delete()
 	mf.eachLine{ line ->
-		
+
 		if(line ==~ /[A-Z].*/) startDelete = false
 		if(line ==~ /.*Bundle-ClassPath:.*/)	startDelete = true
-		
+
 		if(!startDelete && !( line ==~ /(\ |\t)*/) )	newMf << line+"\n"
 	}
 
 	mf.delete()
 	newMf.renameTo(projectPar+"/META-INF/MANIFEST.MF")
-	
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -334,123 +334,123 @@ def deleteManifestClassPath(String projectPar){
 /////////////////////////////////////////////////////////////////////////////////////////
 
 subprojects {
-	
+
 	apply plugin: 'base'
 	apply plugin: 'java'
 //	apply plugin: 'eclipse'
-	
+
 	task deleteArtifacts(type: Delete) {
   		delete 'target','pom.xml'
 	}
-	
-	/////				Copy Dependencies into subprojects DependencyFolder 				///// 
+
+	/////				Copy Dependencies into subprojects DependencyFolder 				/////
 	task collectDependencies(type: Copy) {
 
 		   	from configurations.compile
 			from configurations.runtime
-	   	
-			into "${dependencyFolder}" 	
-			
+
+			into "${dependencyFolder}"
+
 	}
-	
+
 	task setClassPath(dependsOn: 'collectDependencies')<<{
 		description = "\tAdds all your Dependencies from your local lib folder in each project to it's classpath"
 		Boolean exclude = false	// if no lib/dependency folder is found this task will do nothing
 		if( excludeFromClassPath.every{ it != project.name }){
 			def dependencyList = []
 			try{
-				def dir = new File(workspacePath+project.name+"/"+dependencyFolder).eachFile() { file->  		
+				def dir = new File(workspacePath+project.name+"/"+dependencyFolder).eachFile() { file->
 			    	if( !(file.getName() ==~/.*\.txt/) ){
-						dependencyList << file.getName()  
+						dependencyList << file.getName()
 					}
 				}
 			}catch(Exception e){
 				exclude = true
 				println project.name+" has no dependencies in '${dependencyFolder}' defined: Classpath will not be changed"
-			
+
 			}
-					
-			if( features.every{ it != project.name } && !exclude ){	
-					
+
+			if( features.every{ it != project.name } && !exclude ){
+
 				if( excludeManifestClassPathDelete.every{ it != project.name }) deleteManifestClassPath( project.name )
-		
+
 				if( ! checkForRunTimeLibs(project.name) ){					// Adds Lib to Manifest File
 					createRunTimeLib( project.name)
 				}
 				for(int icp = 0; icp < dependencyList.size; icp++){
 	 				addLibToCP(project.name, dependencyList[icp])	//Adds Lib to .classPath file
-						
+
 					if(!checkRunTimeLib(dependencyList[icp], project.name)){		// if library not present add it to RunTimeLibrary
 						addRunTimeLib( dependencyList[icp], project.name)
-					}	
-				}	
-							
+					}
+				}
+
 			def warningReadMe = new File(workspacePath+project.name+"/"+dependencyFolder+"_README.txt")
 			warningReadMe.delete()
 			warningReadMe << "Do Not Remove any Jars/Libraries in this Folder!\nThis folder contains all of your dependencies defined in your gradle script.\n"
 			warningReadMe << "Removing or renaming any of these files will result in an Error in your .classpath file\n"
 			warningReadMe << "If any error concerning missing dependencies should occur please run 'gradle deleteFromClassPath setClassPath' in your workspace folder from your shell."
-			
-			}	
-		}// if exclude		
+
+			}
+		}// if exclude
 	}// setClassPath
-	
-	
-	task deleteFromClassPath()<<{		
-		
+
+
+	task deleteFromClassPath()<<{
+
 		description = "\tDeletes all your Dependencies located in your local lib folder from each project's classpath"
-			
+
 		boolean depsDelete = false
 		def depsFolder = new File(workspacePath+project.name+'/'+dependencyFolder)
 		if(depsFolder.exists()) depsDelete = true
 		depsFolder.deleteDir()
-		
+
 		try{
 
-			if(features.every{ it != project.name } && depsDelete){	
+			if(features.every{ it != project.name } && depsDelete){
 				deleteLibFromCP(project.name)
 			}
-	
+
 		}catch(Exception e){
 			println project.name+": No Classpath File found: ClassPath will not be changed"
 		}
-			
+
 	}
-	
+
 	/////---- 			For a complete classPath Refresh please execute 'gradle deleteFromClassPath setClassPath'				----///////
 
-	////////////////////////////////////////////////////////////////////////////////////////////	
-	
+	////////////////////////////////////////////////////////////////////////////////////////////
+
 	task deploy() <<{
 		description = "\tGenerating the Tycho Poms. Please remember to add a '.qualifier' to the version numbers!"
 
 		String 	versionNumber = 'Version Number Error:\tcheck Manifest for Bundle-Version Number and make sure to add a ".qualifier" to the version numbers!\n'
 		String 	artifactId = 'Could not find Bundle-SymbolicName in Manifest.file'
 
-		
+
 		/* -- In case of changed Manifest File in Eclipse:
-		*	
-		*	Version Numbers of the projects are collected via 
-		*	regular expressions in the Manifest.MF File.  
+		*
+		*	Version Numbers of the projects are collected via
+		*	regular expressions in the Manifest.MF File.
 		*	versionnumber of the projects are equal to their
 		*	Bundle-Version Number
 		*/
-		
-		
-		if(features.every{ it != project.name }){		// Generating Poms for sub projects except features
-			def content = new File(workspacePath+"${project.name}/META-INF/MANIFEST.MF").getText("UTF-8") 
 
-	 		def printFileLine = { 
+
+		if(features.every{ it != project.name }){		// Generating Poms for sub projects except features
+			def content = new File(workspacePath+"${project.name}/META-INF/MANIFEST.MF").getText("UTF-8")
+
+	 		def printFileLine = {
 				if(  it ==~ /Bundle-Version.+qualifier/ ){
-					 versionNumber = it.substring(16) // possibile error: cuts off first 16 chars 
-			
+					 versionNumber = it.substring(16) // possibile error: cuts off first 16 chars
+
 					/*	Version Number is taken from Bundle-Version in Manifest.MF
 					*	If there is no Bundle-Version or the versionnumber needs to
 					*	be taken from a different key word, please change the
 					*	regular expression and the substring above
-					*/	
+					*/
 				}
-		
+
 				if(  it ==~ /Bundle-SymbolicName:.+/ ){
 					artifactId = it
 					artifactId = artifactId.replace("Bundle-SymbolicName:", '');
@@ -462,34 +462,34 @@ subprojects {
 				*	16 chars ';singleton:=true'
 				*/
 			}
-	
+
 			content.eachLine( printFileLine )
-	
+
 			println artifactId
 			println "\t"+versionNumber
-	
-			def f = new File(workspacePath+artifactId+'/pom.xml') 
+
+			def f = new File(workspacePath+artifactId+'/pom.xml')
 			f.delete()
-		
+
 			// 			---- 			Test Cases					 ------ 				//
 
 			if( project.name ==~ /.*\.[tT]ests*/){
-					
+
 				f << start()+elder()+testArtifact(artifactId, versionNumber)+end()
 			}else{
-				
+
 			// ---- 				Normal Plugin 				-----						//
 				f << start()+elder()+artifact(artifactId, versionNumber)+end()
-				/*	
+				/*
 				*	old pom.xml files are deleted and replaced by new auto generated Tycho pom.xml files
 				*/
 			}
 		}else{	//  end  of { if subprojects aren't a feature } Block
-	
+
 //		--		Features 					--			//
-	
+
 			if(features.any{ it == project.name } ){
-			
+
 				def parsedXml = new XmlParser().parse(workspacePath+"${project.name}/feature.xml")
 
 				artifactId   = parsedXml.attribute("id")
@@ -498,14 +498,14 @@ subprojects {
 				println artifactId
 				println "\t"+versionNumber
 
-				def f = new File(workspacePath+artifactId+'/pom.xml') 
+				def f = new File(workspacePath+artifactId+'/pom.xml')
 				f.delete()
-				f << feature(artifactId, versionNumber)				
+				f << feature(artifactId, versionNumber)
 			}
 		}
 	}//deploy
 
-	
+
 }// defining subprojects
 
 
@@ -515,12 +515,12 @@ clean {
 
 task createParent() << {
 	//		---------				 define Parent 				---------		//
-		
-	new File(workspacePath+"${parentID}").mkdir() 			
-	String versionNumber 	=	'1.0.0.qualifier'
+
+	new File(workspacePath+"${parentID}").mkdir()
+	String versionNumber 	=	'1.0.3.qualifier'
 	String artifactId 		=	parentId()
 
-	def f = new File(workspacePath+artifactId+'/pom.xml') 
+	def f = new File(workspacePath+artifactId+'/pom.xml')
 	f.delete()
 	f << parentPom(artifactId)
 	for(int i = 0; i < targetRepositories.size(); i++){
@@ -529,9 +529,9 @@ task createParent() << {
 	f << endRepos()
 	f << moduleStart()
 	for(int i = 0; i < numberOfProjects(); i++){
-		
+
 		if( excludeFromTychoBuild.every{ it != projects(i) } ){
-		
+
 			f << module(projects(i))
 		}
 	}
@@ -543,32 +543,32 @@ task createParent() << {
 task createRepository() << {
 
 	//			------------	 	define Repository			---------		//
-						
-	new File(workspacePath+"${repositoryName}").mkdir() 
-				
-	String versionNumber 	=	'1.0.0.qualifier'
+
+	new File(workspacePath+"${repositoryName}").mkdir()
+
+	String versionNumber 	=	'1.0.3.qualifier'
 	String artifactId		=	repositoryName
-	String featureVersionNumber = '1.0.0.qualifier'
+	String featureVersionNumber = '1.0.3.qualifier'
 	String featureArtifactId
-	def f = new File(workspacePath+artifactId+'/category.xml') 
+	def f = new File(workspacePath+artifactId+'/category.xml')
 	f.delete()
 	f << categoryHead()
 	for(int i = 0; i < features.size(); i++){
-		
+
 		def parsedXml = new XmlParser().parse("${workspacePath}${features[i]}/feature.xml")
-		
+
 		featureVersionNumber  = parsedXml.attribute("version")
 		featureArtifactId  = parsedXml.attribute("id")
-		
+
 		if(noDescriptions){
 			categoryDescriptions[0].put( features[i], parsedXml.attribute("label") )
 			categoryDescriptions[1].put( features[i], parsedXml.description.text() )
 		}
 		f << categoryFeatures(featureArtifactId.replace(workspacePath,''), featureVersionNumber)
 	}// for
-			
+
 	for( int i = 0; i < features.size(); i++ ){
-	
+
 		if(noDescriptions){
 			f << categoryDescription(features[i], categoryDescriptions[0][features[i]] ,categoryDescriptions[1][features[i]] )
 			//						featureName,			label,							description
@@ -576,31 +576,31 @@ task createRepository() << {
 			f << categoryDescription(features[i], categoryDescriptions[features[i]][0] ,categoryDescriptions[features[i]][1])
 		}
 	}//for
-				
+
 	f << categoryEnd()
-				
-	def pom = new File(workspacePath+artifactId+'/pom.xml') 
+
+	def pom = new File(workspacePath+artifactId+'/pom.xml')
 	pom.delete()
 	pom << reposi()
 }// end of repository definition
-	
+
 
 task createPoms(dependsOn: [createParent, createRepository, subprojects.deploy])
 
 
 task install(dependsOn: [createPoms] , type:Exec) {
-	description = "\tExecutes a 'mvn install' of the parent pom.xml and auto-generates Tycho Poms"	
+	description = "\tExecutes a 'mvn install' of the parent pom.xml and auto-generates Tycho Poms"
 	commandLine 'mvn', 'install', '-f', workspacePath+parentID+'/pom.xml'
 }
 
 task completeInstall(dependsOn: [subprojects.collectDependencies, createPoms], type:Exec ){
-	
+
 	description = "\tCopies dependencies into dependencyFolder of each subproject and executes a 'mvn install' of the parent pom.xml and auto-generates Tycho Poms"
 	commandLine 'mvn', 'install', '-f', workspacePath+parentID+'/pom.xml'
 }
 
 task tycho(dependsOn: [createPoms] , type:Exec) {
-	description = "\tExecutes a 'mvn install' of the parent pom.xml and auto-generates Tycho Poms"	
+	description = "\tExecutes a 'mvn install' of the parent pom.xml and auto-generates Tycho Poms"
 	commandLine 'mvn', 'install', '-f', workspacePath+parentID+'/pom.xml'
 }
 
@@ -614,27 +614,27 @@ task tycho(dependsOn: [createPoms] , type:Exec) {
 		<version>${versionNumber}</version>
 		<packaging>eclipse-plugin</packaging>
 	""" }
-	
+
     def testArtifact(artifactId,versionNumber) { """
 		<groupId>${groupId()}</groupId>
 		<artifactId>${artifactId}</artifactId>
 		<version>${versionNumber}</version>
 		<packaging>eclipse-test-plugin</packaging>
 	""" }
-	
-			
+
+
 	def start() { """<?xml version="1.0" encoding="UTF-8"?>
 	<project
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 		<modelVersion>4.0.0</modelVersion>
 	"""}
-	
-	
+
+
 	def elder() {"""
 		<parent>
 			<groupId>${groupId()}</groupId>
 			<artifactId>${parentId()}</artifactId>
-			<version>1.0.0.qualifier</version>
+			<version>1.0.3.qualifier</version>
 			<relativePath>../${parentId()}/pom.xml</relativePath>
 		</parent>
 	"""}
@@ -643,7 +643,7 @@ task tycho(dependsOn: [createPoms] , type:Exec) {
 	def end() {"""
 	</project>
 	"""}
-	
+
 // 				--	defining Parent Pom				--				//
 
 
@@ -652,11 +652,11 @@ task tycho(dependsOn: [createPoms] , type:Exec) {
 def parentPom(artifactId) { """<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>${groupId()}</groupId>
   	<artifactId>${artifactId}</artifactId>
-  	<version>1.0.0.qualifier</version>
-  
+  	<version>1.0.3.qualifier</version>
+
 	<packaging>pom</packaging>
 
 	<!-- this is the parent POM from which all modules inherit common settings -->
@@ -665,14 +665,14 @@ def parentPom(artifactId) { """<?xml version="1.0" encoding="UTF-8"?>
 	</properties>
 
    <repositories>
-	<!-- configure p2 repository to resolve against -->  
-    
+	<!-- configure p2 repository to resolve against -->
+
 
 """}
 
 
 def repos(String targetRepo, int i) {"""
-	
+
 	<repository>
 	  <id>targetRepository${i}</id>
 	  <layout>p2</layout>
@@ -684,7 +684,7 @@ def repos(String targetRepo, int i) {"""
 
 
 def endRepos() {"""
-  </repositories> 
+  </repositories>
 
 	<build>
 		<plugins>
@@ -695,7 +695,7 @@ def endRepos() {"""
 				<version>${tychoVersion}</version>
 				<extensions>true</extensions>
 			</plugin>
-			
+
 			<plugin>
 		    <groupId>org.eclipse.tycho</groupId>
 		    <artifactId>target-platform-configuration</artifactId>
@@ -706,7 +706,7 @@ def endRepos() {"""
 		      </dependency-resolution>
 		    </configuration>
 		  </plugin>
-			
+
 		</plugins>
 	</build>
 """}
@@ -721,13 +721,13 @@ def moduleStart(){"""
 def module(String project){"""		<module>../${project}</module>
 """}
 
-	
+
 
 def endParent() {"""
 	</modules>
 </project>
 	"""}
-	
+
 // end of defining parent pom.xml
 
 // repository Pom
@@ -739,22 +739,22 @@ def reposi() { """
     <parent>
       <groupId>${groupID}</groupId>
       <artifactId>${parentID}</artifactId>
-      <version>1.0.0.qualifier</version>
+      <version>1.0.3.qualifier</version>
       <relativePath>../${parentID}/pom.xml</relativePath>
     </parent>
 
-    
+
     <groupId>${groupID}</groupId>
     <artifactId>${repositoryName}</artifactId>
-    <version>1.0.0.qualifier</version>
+    <version>1.0.3.qualifier</version>
     <packaging>eclipse-repository</packaging>
-	
-	${reposiBuildStep()} 
+
+	${reposiBuildStep()}
 </project>
 """}
 
 def String reposiBuildStep(){
-	
+
 	if( buildProduct != false ){
 		return	"""
 		    <build>
@@ -791,12 +791,12 @@ def String reposiBuildStep(){
 }
 
 
-// creates a category in 
+// creates a category in
 def categoryHead() { """<?xml version="1.0" encoding="UTF-8"?>
 <site>
 
 """}
-	
+
 def categoryFeatures(artifactId, versionNumber){"""
 	<feature url="features/${artifactId}_${versionNumber}.jar" id="${artifactId}" version="${versionNumber}">
 		<category name="${artifactId}.category"/>
@@ -825,7 +825,7 @@ def feature(artifactId, versionNumber) { """
 		<parent>
 			<groupId>${groupId()}</groupId>
 			<artifactId>${parentId()}</artifactId>
-			<version>1.0.0.qualifier</version>
+			<version>1.0.3.qualifier</version>
 			<relativePath>../${parentId()}/pom.xml</relativePath>
 		</parent>
 		<groupId>${groupId()}</groupId>
@@ -845,7 +845,7 @@ def productXML(){
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="${groupID}.product" uid="${groupID}" id="${groupID}.product" application="${product}" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="${groupID}.product" uid="${groupID}" id="${groupID}.product" application="${product}" version="1.0.3.qualifier" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -857,12 +857,12 @@ def productXML(){
    </launcherArgs>
 
    <plugins>
-     
+
    </plugins>
 	<features>
 """+listProductFeature()+"""
    	<feature id="org.eclipse.rcp" version="3.7.2.v20120120-1424-9DB5FmnFq5JCf1UA38R-kz0S0272"/>
-	</features>  
+	</features>
    <configurations>
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
@@ -879,7 +879,7 @@ def productXML(){
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="de.prob.product" uid="de.prob" id="de.prob.standalone.product" application="de.prob.standalone.application" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+<product name="de.prob.product" uid="de.prob" id="de.prob.standalone.product" application="de.prob.standalone.application" version="1.0.3.qualifier" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -899,25 +899,25 @@ def productXML(){
 
 /*
 
-     <feature id="birkhoff.feature" version="1.0.0.qualifier"/>
-    
+     <feature id="birkhoff.feature" version="1.0.3.qualifier"/>
 
-*/	
+
+*/
 /*
 }
 
 def String listProductFeatures(){
 	String returnString = ""
 	for(int i = 0; i < features.size(); i++){
-		
-		returnString +=  '\n\t\t<feature id="${features[i]}" version="1.0.0.qualifier"/>'
-		
+
+		returnString +=  '\n\t\t<feature id="${features[i]}" version="1.0.3.qualifier"/>'
+
 	}
 	return returnString
-	
+
 }
 */
 
 //	Build Script can be executed via gradle install
-// 	For a complete classPath Refresh please execute 'gradle deleteFromClassPath setClassPath'	
+// 	For a complete classPath Refresh please execute 'gradle deleteFromClassPath setClassPath'
 //	Pom Generation can be executed via gradle deploy

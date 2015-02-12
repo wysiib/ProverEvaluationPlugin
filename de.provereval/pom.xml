@@ -6,13 +6,13 @@
 		<parent>
 			<groupId>de.provereval</groupId>
 			<artifactId>de.provereval.parent</artifactId>
-			<version>1.0.0.qualifier</version>
+			<version>1.0.3.qualifier</version>
 			<relativePath>../de.provereval.parent/pom.xml</relativePath>
 		</parent>
 	
 		<groupId>de.provereval</groupId>
 		<artifactId>de.provereval</artifactId>
-		<version>1.0.0.qualifier</version>
+		<version>1.0.3.qualifier</version>
 		<packaging>eclipse-plugin</packaging>
 	
 	</project>
