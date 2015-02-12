@@ -32,10 +32,10 @@ import org.rodinp.core.IRodinProject;
 import org.rodinp.core.RodinCore;
 import org.rodinp.core.RodinDBException;
 
+import de.provereval.dialogs.ResultDialog;
+import de.provereval.dialogs.SequentSelectionDialog;
 import de.provereval.labelproviders.ReasonersLabelProvider;
 import de.provereval.output.CSVExporter;
-import dialogs.ResultDialog;
-import dialogs.SequentSelectionDialog;
 
 public class EvalCommand extends AbstractHandler {
 	Shell shell;

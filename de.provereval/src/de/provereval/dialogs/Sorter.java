@@ -1,4 +1,4 @@
-package dialogs;
+package de.provereval.dialogs;
 
 import java.util.List;
 

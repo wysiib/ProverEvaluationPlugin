@@ -1,4 +1,4 @@
-package dialogs;
+package de.provereval.dialogs;
 
 import java.util.ArrayList;
 import java.util.Comparator;
