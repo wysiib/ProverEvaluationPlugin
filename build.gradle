@@ -1,8 +1,8 @@
 project.ext {
 
-	targetRepositories = ["http://download.eclipse.org/releases/indigo/",
+	targetRepositories = ["http://download.eclipse.org/releases/luna/",
                           "http://rodin-b-sharp.sourceforge.net/updates",
-                          "http://rodin-b-sharp.sourceforge.net/core-updates"]	
+                          "http://rodin-b-sharp.sourceforge.net/core-updates"]
 
 	groupID = "de.provereval"
 
@@ -18,14 +18,14 @@ apply from: 'tycho_build.gradle'
 
 
 /*************************************************************************************
- 	
+
 	gradle shell tasks:
 
 	gradle collectDependencies 		-	downloads your dependencies from your gradle script in the lib/dependencies folder
 	gradle setClassPath				-	downloads your dependencies and also adds them to your classpath and Manifet Files
-	
+
 	gradle tycho					-	triggers a tycho build
-	
+
 	gradle completeInstall			- 	does all the above
 
 
