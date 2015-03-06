@@ -32,9 +32,6 @@ public class SolverRunnable implements IRunnableWithProgress {
 		monitor.beginTask("Running Provers", tasks.size());
 
 		int cores = Runtime.getRuntime().availableProcessors();
-		if (cores != 1) {
-			cores--; // do not use all cores if possible to avoid blocking
-		}
 		ExecutorService pool = Executors.newFixedThreadPool(cores);
 
 		for (ProverEvaluationTask task : tasks) {
