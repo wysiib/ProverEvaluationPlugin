@@ -31,8 +31,7 @@ public class SolverRunnable implements IRunnableWithProgress {
 		List<Future<ProverEvaluationResult>> futures = new ArrayList<Future<ProverEvaluationResult>>();
 		monitor.beginTask("Running Provers", tasks.size());
 
-		int cores = Runtime.getRuntime().availableProcessors();
-		ExecutorService pool = Executors.newFixedThreadPool(cores);
+		ExecutorService pool = Executors.newCachedThreadPool();
 
 		for (ProverEvaluationTask task : tasks) {
 			futures.add(pool.submit(task));
