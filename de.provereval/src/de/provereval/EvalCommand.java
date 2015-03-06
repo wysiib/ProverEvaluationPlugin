@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -40,6 +42,7 @@ import de.provereval.output.CSVExporter;
 public class EvalCommand extends AbstractHandler {
 	Shell shell;
 	private boolean headless;
+	private final Map<String, Lock> locks = new HashMap<String, Lock>();
 
 	public EvalCommand() {
 		this(false);
@@ -165,7 +168,7 @@ public class EvalCommand extends AbstractHandler {
 
 		for (IPOSequent sequent : allProverSequents) {
 			for (IPrefMapEntry<ITacticDescriptor> reasoner : allReasoners) {
-				tasks.add(new ProverEvaluationTask(reasoner, sequent));
+				tasks.add(new ProverEvaluationTask(this, reasoner, sequent));
 			}
 		}
 
@@ -193,6 +196,16 @@ public class EvalCommand extends AbstractHandler {
 		}
 
 		return sequents;
+	}
+
+	public Lock getLockForTactic(String tacticName) {
+		if (locks.containsKey(tacticName)) {
+			return locks.get(tacticName);
+		} else {
+			Lock l = new ReentrantLock();
+			locks.put(tacticName, l);
+			return l;
+		}
 	}
 
 }
