@@ -167,7 +167,7 @@ public class EvalCommand extends AbstractHandler {
 		IPreferencesService ps = Platform.getPreferencesService();
 		String string = ps.getString("org.eventb.core", "Tactics Map",
 				"nix nada nothing", null);
-		System.out.println(string);
+		// System.out.println(string);
 
 		CachedPreferenceMap<ITacticDescriptor> preferenceMap = TacticPreferenceFactory
 				.makeTacticPreferenceMap();
