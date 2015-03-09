@@ -1,6 +1,7 @@
 package de.provereval.labelproviders;
 
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eventb.core.IPOSequent;
 
