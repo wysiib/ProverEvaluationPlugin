@@ -30,13 +30,15 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
 	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
 	private final IPrefMapEntry<ITacticDescriptor> tactic;
-	private final IPOSequent sequent;
+	private final IProverSequent sequent;
+	private final IPOSequent poSequent;
 
 	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner,
-			IPOSequent sequent) {
+			IPOSequent sequent) throws RodinDBException {
 		super();
 		this.tactic = reasoner;
-		this.sequent = sequent;
+		this.sequent = toProverSequent(sequent);
+		this.poSequent = sequent;
 	}
 
 	public static IProverSequent toProverSequent(IPOSequent sequent)
@@ -58,10 +60,8 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	@Override
 	public ProverEvaluationResult call() throws Exception {
 		long took = 0;
-		ProverEvaluationResult.TaskStatus status;
 		try {
-			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
-					.getRoot();
+			ProofTreeNode node = new ProofTree(sequent, null).getRoot();
 
 			ITacticDescriptor descriptor = tactic.getValue();
 			ITactic instance = descriptor.getTacticInstance();
@@ -70,35 +70,39 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 			instance.apply(node, Util.getNullProofMonitor());
 			took = System.currentTimeMillis() - start;
 
-			// check for all child nodes if they are discharged
-			status = TaskStatus.PROVEN;
-
 			Stack<ProofTreeNode> childNodes = new Stack<ProofTreeNode>();
 			childNodes.add(node);
 
 			while (!childNodes.isEmpty()) {
 				// add all sub-nodes to stack
 				ProofTreeNode cur = childNodes.pop();
-				childNodes.addAll(Arrays.asList(cur.getChildNodes()));
 
-				if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
-					if (cur.getRule().getDisplayName()
-							.contains("Counter-Example found")) {
-						status = TaskStatus.DISPROVEN;
-					} else {
-						status = TaskStatus.NOT_PROVEN;
+				if (cur.hasChildren()) {
+					childNodes.addAll(Arrays.asList(cur.getChildNodes()));
+				} else {
+					if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
+						if (cur.getRule() != null
+								&& cur.getRule().getDisplayName()
+										.startsWith("Counter-Example found")) {
+							return new ProverEvaluationResult(
+									rProvider.getText(tactic),
+									sProvider.getText(poSequent), took,
+									TaskStatus.DISPROVEN);
+						} else {
+							return new ProverEvaluationResult(
+									rProvider.getText(tactic),
+									sProvider.getText(poSequent), took,
+									TaskStatus.NOT_PROVEN);
+						}
 					}
-					break;
 				}
 			}
-		} catch (RodinDBException e) {
-			// prover crashed somehow
-			status = TaskStatus.CRASHED;
 		} catch (IllegalStateException e) {
-			status = TaskStatus.CRASHED;
+			return new ProverEvaluationResult(rProvider.getText(tactic),
+					sProvider.getText(poSequent), took, TaskStatus.CRASHED);
 		}
 
 		return new ProverEvaluationResult(rProvider.getText(tactic),
-				sProvider.getText(sequent), took, status);
+				sProvider.getText(poSequent), took, TaskStatus.PROVEN);
 	}
 }
