@@ -41,9 +41,7 @@ public class SolverRunnable implements IRunnableWithProgress {
 			try {
 				results.add(futures.get(i).get());
 			} catch (ExecutionException e) {
-				canceled = true;
-				monitor.done();
-				return;
+				monitor.setCanceled(true);
 			}
 
 			monitor.worked(1);
@@ -51,6 +49,7 @@ public class SolverRunnable implements IRunnableWithProgress {
 					+ tasks.size());
 
 			if (monitor.isCanceled()) {
+				pool.shutdownNow();
 				canceled = true;
 				monitor.done();
 				return;
