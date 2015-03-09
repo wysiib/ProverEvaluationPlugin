@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.swt.widgets.Shell;
@@ -63,56 +64,71 @@ public class EvalCommand extends AbstractHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		try {
-			// get all reasoners and ask the user which ones to benchmark
-			List<IPrefMapEntry<ITacticDescriptor>> allReasoners = getAllTactics();
-			if (!headless) {
-				ListSelectionDialog dlg = new ListSelectionDialog(shell,
-						allReasoners, new ArrayContentProvider(),
-						new ReasonersLabelProvider(),
-						"Select the reasoners you want to apply:");
-				dlg.setTitle("Select Reasoners");
-				dlg.setInitialSelections(allReasoners.toArray());
-				dlg.open();
+		// get all reasoners and ask the user which ones to benchmark
+		List<IPrefMapEntry<ITacticDescriptor>> allReasoners = getAllTactics();
+		if (!headless) {
+			ListSelectionDialog dlg = new ListSelectionDialog(shell,
+					allReasoners, new ArrayContentProvider(),
+					new ReasonersLabelProvider(),
+					"Select the reasoners you want to apply:");
+			dlg.setTitle("Select Reasoners");
+			dlg.setInitialSelections(allReasoners.toArray());
+			dlg.open();
 
-				allReasoners.clear();
-				for (Object o : dlg.getResult()) {
-					allReasoners.add((IPrefMapEntry<ITacticDescriptor>) o);
-				}
+			allReasoners.clear();
+			for (Object o : dlg.getResult()) {
+				allReasoners.add((IPrefMapEntry<ITacticDescriptor>) o);
 			}
-
-			// same for sequents
-			List<IPOSequent> allProverSequents = getAllProverSequents();
-			if (!headless) {
-				SequentSelectionDialog ssDiag = new SequentSelectionDialog(
-						shell, allProverSequents);
-				ssDiag.open();
-				allProverSequents.clear();
-				allProverSequents.addAll(ssDiag.getSelectedProverSequents());
-			}
-
-			// combine selected reasoners / sequents to a list of tasks
-			List<ProverEvaluationTask> tasks = generateTasks(allProverSequents,
-					allReasoners);
-
-			SolverRunnable runnable = evaluate(tasks);
-
-			if (!runnable.isCanceled()) {
-
-				Map<String, List<ProverEvaluationResult>> grouped = groupTasksBySequent(runnable
-						.getResults());
-
-				if (headless) {
-					String[] applicationArgs = Platform.getApplicationArgs();
-					CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
-				} else {
-					new ResultDialog(shell, grouped).open();
-				}
-			}
-		} catch (RodinDBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
+		// same for sequents
+		List<IPOSequent> allProverSequents;
+		try {
+			allProverSequents = getAllProverSequents();
+		} catch (RodinDBException rdb) {
+			MessageDialog
+					.openError(
+							shell,
+							"A RodinDBException Occured",
+							"A RodinDBException occured while fetching available tactics. Benchmarks have been aborted.");
+			return null;
+		}
+		if (!headless) {
+			SequentSelectionDialog ssDiag = new SequentSelectionDialog(shell,
+					allProverSequents);
+			ssDiag.open();
+			allProverSequents.clear();
+			allProverSequents.addAll(ssDiag.getSelectedProverSequents());
+		}
+
+		List<ProverEvaluationTask> tasks;
+		try {
+			// combine selected reasoners / sequents to a list of tasks
+			tasks = generateTasks(allProverSequents, allReasoners);
+		} catch (RodinDBException rdb) {
+			MessageDialog
+					.openError(
+							shell,
+							"A RodinDBException Occured",
+							"A RodinDBException occured while fetching sequents. Benchmarks have been aborted.");
+			return null;
+		}
+
+		SolverRunnable runnable = evaluate(tasks);
+
+		if (!runnable.isCanceled()) {
+
+			Map<String, List<ProverEvaluationResult>> grouped = groupTasksBySequent(runnable
+					.getResults());
+
+			if (headless) {
+				String[] applicationArgs = Platform.getApplicationArgs();
+				CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
+			} else {
+				new ResultDialog(shell, grouped).open();
+			}
+		}
+
 		return null;
 	}
 
