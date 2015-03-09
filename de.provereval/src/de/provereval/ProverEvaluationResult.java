@@ -2,7 +2,7 @@ package de.provereval;
 
 public class ProverEvaluationResult {
 	public enum TaskStatus {
-		PROVEN, NOT_PROVEN, CRASHED
+		PROVEN, NOT_PROVEN, CRASHED, DISPROVEN
 	};
 
 	private final TaskStatus status;
@@ -20,6 +20,10 @@ public class ProverEvaluationResult {
 
 	public boolean isProven() {
 		return status == TaskStatus.PROVEN;
+	}
+
+	public boolean isDisproven() {
+		return status == TaskStatus.DISPROVEN;
 	}
 
 	public long getTook() {

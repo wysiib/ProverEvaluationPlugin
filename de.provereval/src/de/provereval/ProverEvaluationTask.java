@@ -87,7 +87,12 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 				childNodes.addAll(Arrays.asList(cur.getChildNodes()));
 
 				if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
-					status = TaskStatus.NOT_PROVEN;
+					if (cur.getRule().getDisplayName()
+							.contains("Counter-Example found")) {
+						status = TaskStatus.DISPROVEN;
+					} else {
+						status = TaskStatus.NOT_PROVEN;
+					}
 					break;
 				}
 			}

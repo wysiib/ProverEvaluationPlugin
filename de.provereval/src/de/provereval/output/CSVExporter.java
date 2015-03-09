@@ -52,6 +52,8 @@ public class CSVExporter {
 							grouped.get(key));
 					if (task.isProven()) {
 						writer.write("1");
+					} else if (task.isDisproven()) {
+						writer.write("-1");
 					} else {
 						writer.write("0");
 					}
