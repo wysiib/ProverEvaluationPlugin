@@ -30,15 +30,13 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
 	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
 	private final IPrefMapEntry<ITacticDescriptor> tactic;
-	private final IProverSequent sequent;
-	private final IPOSequent poSequent;
+	private final IPOSequent sequent;
 
 	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner,
 			IPOSequent sequent) throws RodinDBException {
 		super();
 		this.tactic = reasoner;
-		this.sequent = toProverSequent(sequent);
-		this.poSequent = sequent;
+		this.sequent = sequent;
 	}
 
 	public static IProverSequent toProverSequent(IPOSequent sequent)
@@ -61,7 +59,8 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	public ProverEvaluationResult call() throws Exception {
 		long took = 0;
 		try {
-			ProofTreeNode node = new ProofTree(sequent, null).getRoot();
+			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
+					.getRoot();
 
 			ITacticDescriptor descriptor = tactic.getValue();
 			ITactic instance = descriptor.getTacticInstance();
@@ -86,12 +85,12 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 										.startsWith("Counter-Example found")) {
 							return new ProverEvaluationResult(
 									rProvider.getText(tactic),
-									sProvider.getText(poSequent), took,
+									sProvider.getText(sequent), took,
 									TaskStatus.DISPROVEN);
 						} else {
 							return new ProverEvaluationResult(
 									rProvider.getText(tactic),
-									sProvider.getText(poSequent), took,
+									sProvider.getText(sequent), took,
 									TaskStatus.NOT_PROVEN);
 						}
 					}
@@ -99,10 +98,10 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 			}
 		} catch (IllegalStateException e) {
 			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(poSequent), took, TaskStatus.CRASHED);
+					sProvider.getText(sequent), took, TaskStatus.CRASHED);
 		}
 
 		return new ProverEvaluationResult(rProvider.getText(tactic),
-				sProvider.getText(poSequent), took, TaskStatus.PROVEN);
+				sProvider.getText(sequent), took, TaskStatus.PROVEN);
 	}
 }
