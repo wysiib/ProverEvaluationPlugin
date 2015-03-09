@@ -28,18 +28,16 @@ public class SolverRunnable implements IRunnableWithProgress {
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException,
 			InterruptedException {
-		List<Future<ProverEvaluationResult>> futures = new ArrayList<Future<ProverEvaluationResult>>();
 		monitor.beginTask("Running Provers", tasks.size());
 
 		ExecutorService pool = Executors.newSingleThreadExecutor();
 
-		for (ProverEvaluationTask task : tasks) {
-			futures.add(pool.submit(task));
-		}
-
 		for (int i = 0; i < tasks.size(); i++) {
 			try {
-				results.add(futures.get(i).get());
+				ProverEvaluationTask currentTask = tasks.get(i);
+				Future<ProverEvaluationResult> submit = pool
+						.submit(currentTask);
+				results.add(submit.get());
 			} catch (ExecutionException e) {
 				monitor.setCanceled(true);
 			}
