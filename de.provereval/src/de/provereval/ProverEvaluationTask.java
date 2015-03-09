@@ -91,8 +91,10 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 					break;
 				}
 			}
-		} catch (Exception e) {
+		} catch (RodinDBException e) {
 			// prover crashed somehow
+			status = TaskStatus.CRASHED;
+		} catch (IllegalStateException e) {
 			status = TaskStatus.CRASHED;
 		}
 
