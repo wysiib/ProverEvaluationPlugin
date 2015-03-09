@@ -31,14 +31,12 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
 	private final IPrefMapEntry<ITacticDescriptor> tactic;
 	private final IPOSequent sequent;
-	private final EvalCommand topLevelCommand;
 
-	public ProverEvaluationTask(EvalCommand topLevelCommand,
-			IPrefMapEntry<ITacticDescriptor> reasoner, IPOSequent sequent) {
+	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner,
+			IPOSequent sequent) {
 		super();
 		this.tactic = reasoner;
 		this.sequent = sequent;
-		this.topLevelCommand = topLevelCommand;
 	}
 
 	public static IProverSequent toProverSequent(IPOSequent sequent)
@@ -59,9 +57,6 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 
 	@Override
 	public ProverEvaluationResult call() throws Exception {
-		// some prove tactics do not like being executed in parallel
-		// hence, lock on the tactic but allow different tactics to be executed
-		topLevelCommand.getLockForTactic(rProvider.getText(tactic)).lock();
 		long took = 0;
 		ProverEvaluationResult.TaskStatus status;
 		try {
@@ -103,7 +98,6 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 			status = TaskStatus.CRASHED;
 		}
 
-		topLevelCommand.getLockForTactic(rProvider.getText(tactic)).unlock();
 		return new ProverEvaluationResult(rProvider.getText(tactic),
 				sProvider.getText(sequent), took, status);
 	}
