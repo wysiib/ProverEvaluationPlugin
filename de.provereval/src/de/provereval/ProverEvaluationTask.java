@@ -102,6 +102,11 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 		} catch (RodinDBException e) {
 			return new ProverEvaluationResult(rProvider.getText(tactic),
 					sProvider.getText(sequent), took, TaskStatus.CRASHED);
+		} catch (NullPointerException e) {
+			// these are caused by an error in the provers, so this is a bug!
+			// maybe the result should be reported differently
+			return new ProverEvaluationResult(rProvider.getText(tactic),
+					sProvider.getText(sequent), took, TaskStatus.CRASHED);
 		}
 
 		return new ProverEvaluationResult(rProvider.getText(tactic),
