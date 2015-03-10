@@ -33,7 +33,7 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	private final IPOSequent sequent;
 
 	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner,
-			IPOSequent sequent) throws RodinDBException {
+			IPOSequent sequent) {
 		super();
 		this.tactic = reasoner;
 		this.sequent = sequent;
@@ -56,7 +56,7 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	}
 
 	@Override
-	public ProverEvaluationResult call() throws Exception {
+	public ProverEvaluationResult call() {
 		long took = 0;
 		try {
 			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
@@ -97,6 +97,9 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 				}
 			}
 		} catch (IllegalStateException e) {
+			return new ProverEvaluationResult(rProvider.getText(tactic),
+					sProvider.getText(sequent), took, TaskStatus.CRASHED);
+		} catch (RodinDBException e) {
 			return new ProverEvaluationResult(rProvider.getText(tactic),
 					sProvider.getText(sequent), took, TaskStatus.CRASHED);
 		}
