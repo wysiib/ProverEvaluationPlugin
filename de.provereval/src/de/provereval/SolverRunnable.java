@@ -39,6 +39,11 @@ public class SolverRunnable implements IRunnableWithProgress {
 						.submit(currentTask);
 				results.add(submit.get());
 			} catch (ExecutionException e) {
+				System.out
+						.println("Execution Exception when evaluating provers:");
+				e.printStackTrace();
+				System.out.println("Caused by:");
+				e.getCause().printStackTrace();
 				monitor.setCanceled(true);
 			}
 
