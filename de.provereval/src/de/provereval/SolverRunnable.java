@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -31,13 +33,20 @@ public class SolverRunnable implements IRunnableWithProgress {
 		monitor.beginTask("Running Provers", tasks.size());
 
 		ExecutorService pool = Executors.newSingleThreadExecutor();
+		ProverEvaluationTask currentTask;
 
 		for (int i = 0; i < tasks.size(); i++) {
 			try {
-				ProverEvaluationTask currentTask = tasks.get(i);
+				currentTask = tasks.get(i);
 				Future<ProverEvaluationResult> submit = pool
 						.submit(currentTask);
-				results.add(submit.get());
+				try {
+					ProverEvaluationResult result = submit.get(25,
+							TimeUnit.SECONDS);
+					results.add(result);
+				} catch (TimeoutException e) {
+					results.add(currentTask.getTimeoutResult());
+				}
 			} catch (ExecutionException e) {
 				System.out
 						.println("Execution Exception when evaluating provers:");

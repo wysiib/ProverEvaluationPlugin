@@ -115,4 +115,10 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 				sProvider.getText(sequent), took,
 				ProverEvaluationTaskStatus.PROVEN);
 	}
+
+	public ProverEvaluationResult getTimeoutResult() {
+		return new ProverEvaluationResult(rProvider.getText(tactic),
+				sProvider.getText(sequent), 25000,
+				ProverEvaluationTaskStatus.NOT_PROVEN);
+	}
 }
