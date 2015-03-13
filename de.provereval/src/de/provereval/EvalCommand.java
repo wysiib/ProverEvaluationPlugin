@@ -98,18 +98,10 @@ public class EvalCommand extends AbstractHandler {
 			allProverSequents.addAll(ssDiag.getSelectedProverSequents());
 		}
 
-		List<ProverEvaluationTask> tasks;
-		try {
-			// combine selected reasoners / sequents to a list of tasks
-			tasks = generateTasks(allProverSequents, allReasoners);
-		} catch (RodinDBException rdb) {
-			MessageDialog
-					.openError(
-							shell,
-							"A RodinDBException Occured",
-							"A RodinDBException occured while fetching sequents. Benchmarks have been aborted.");
-			return null;
-		}
+		ProverEvaluationTaskList tasks;
+
+		// combine selected reasoners / sequents to a list of tasks
+		tasks = new ProverEvaluationTaskList(allProverSequents, allReasoners);
 
 		SolverRunnable runnable = evaluate(tasks);
 
@@ -145,7 +137,7 @@ public class EvalCommand extends AbstractHandler {
 		return grouped;
 	}
 
-	private SolverRunnable evaluate(final List<ProverEvaluationTask> tasks) {
+	private SolverRunnable evaluate(final ProverEvaluationTaskList tasks) {
 		SolverRunnable runnable = new SolverRunnable(tasks);
 		ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell);
 		try {
@@ -171,21 +163,6 @@ public class EvalCommand extends AbstractHandler {
 		preferenceMap.inject(string);
 
 		return preferenceMap.getEntries();
-	}
-
-	private List<ProverEvaluationTask> generateTasks(
-			List<IPOSequent> allProverSequents,
-			List<IPrefMapEntry<ITacticDescriptor>> allReasoners)
-			throws RodinDBException {
-		List<ProverEvaluationTask> tasks = new ArrayList<ProverEvaluationTask>();
-
-		for (IPOSequent sequent : allProverSequents) {
-			for (IPrefMapEntry<ITacticDescriptor> reasoner : allReasoners) {
-				tasks.add(new ProverEvaluationTask(reasoner, sequent));
-			}
-		}
-
-		return tasks;
 	}
 
 	private List<IPOSequent> getAllProverSequents() throws RodinDBException {

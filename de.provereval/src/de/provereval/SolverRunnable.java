@@ -12,11 +12,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
 public class SolverRunnable implements IRunnableWithProgress {
-	private final List<ProverEvaluationTask> tasks;
+	private final ProverEvaluationTaskList tasks;
 	private final List<ProverEvaluationResult> results;
 	private boolean canceled = false;
 
-	public SolverRunnable(List<ProverEvaluationTask> tasks) {
+	public SolverRunnable(ProverEvaluationTaskList tasks) {
 		this.tasks = tasks;
 		results = new ArrayList<ProverEvaluationResult>(tasks.size());
 	}
