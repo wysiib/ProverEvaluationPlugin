@@ -1,17 +1,13 @@
 package de.provereval;
 
 public class ProverEvaluationResult {
-	public enum TaskStatus {
-		PROVEN, NOT_PROVEN, CRASHED, DISPROVEN
-	};
-
-	private final TaskStatus status;
+	private final ProverEvaluationTaskStatus status;
 	private final long took;
 	private final String sequentName;
 	private final String proverName;
 
 	public ProverEvaluationResult(String proverName, String sequentName,
-			long took, TaskStatus status) {
+			long took, ProverEvaluationTaskStatus status) {
 		this.proverName = proverName;
 		this.sequentName = sequentName;
 		this.took = took;
@@ -19,11 +15,11 @@ public class ProverEvaluationResult {
 	}
 
 	public boolean isProven() {
-		return status == TaskStatus.PROVEN;
+		return status == ProverEvaluationTaskStatus.PROVEN;
 	}
 
 	public boolean isDisproven() {
-		return status == TaskStatus.DISPROVEN;
+		return status == ProverEvaluationTaskStatus.DISPROVEN;
 	}
 
 	public long getTook() {

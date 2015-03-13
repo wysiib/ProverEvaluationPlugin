@@ -21,7 +21,6 @@ import org.eventb.internal.core.seqprover.ProofTreeNode;
 import org.eventb.internal.core.seqprover.Util;
 import org.rodinp.core.RodinDBException;
 
-import de.provereval.ProverEvaluationResult.TaskStatus;
 import de.provereval.labelproviders.ReasonersLabelProvider;
 import de.provereval.labelproviders.SequentsLabelProvider;
 
@@ -86,30 +85,34 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 							return new ProverEvaluationResult(
 									rProvider.getText(tactic),
 									sProvider.getText(sequent), took,
-									TaskStatus.DISPROVEN);
+									ProverEvaluationTaskStatus.DISPROVEN);
 						} else {
 							return new ProverEvaluationResult(
 									rProvider.getText(tactic),
 									sProvider.getText(sequent), took,
-									TaskStatus.NOT_PROVEN);
+									ProverEvaluationTaskStatus.NOT_PROVEN);
 						}
 					}
 				}
 			}
 		} catch (IllegalStateException e) {
 			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took, TaskStatus.CRASHED);
+					sProvider.getText(sequent), took,
+					ProverEvaluationTaskStatus.CRASHED);
 		} catch (RodinDBException e) {
 			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took, TaskStatus.CRASHED);
+					sProvider.getText(sequent), took,
+					ProverEvaluationTaskStatus.CRASHED);
 		} catch (NullPointerException e) {
 			// these are caused by an error in the provers, so this is a bug!
 			// maybe the result should be reported differently
 			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took, TaskStatus.CRASHED);
+					sProvider.getText(sequent), took,
+					ProverEvaluationTaskStatus.CRASHED);
 		}
 
 		return new ProverEvaluationResult(rProvider.getText(tactic),
-				sProvider.getText(sequent), took, TaskStatus.PROVEN);
+				sProvider.getText(sequent), took,
+				ProverEvaluationTaskStatus.PROVEN);
 	}
 }
