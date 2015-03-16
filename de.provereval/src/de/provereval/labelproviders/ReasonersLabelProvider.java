@@ -42,6 +42,6 @@ public class ReasonersLabelProvider implements ILabelProvider {
 	@Override
 	public String getText(Object element) {
 		IPrefMapEntry<ITacticDescriptor> tactic = (IPrefMapEntry<ITacticDescriptor>) element;
-		return tactic.getKey();
+		return tactic.getKey().intern();
 	}
 }

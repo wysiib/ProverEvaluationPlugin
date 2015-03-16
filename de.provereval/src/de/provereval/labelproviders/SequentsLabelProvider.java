@@ -48,7 +48,8 @@ public class SequentsLabelProvider implements ILabelProvider {
 		String fileName = sequent.getRoot().getResource().getName()
 				.replace(".bpo", "");
 
-		return projectName + ":" + fileName + ":" + sequent.getElementName();
+		return projectName + ":" + fileName + ":"
+				+ sequent.getElementName().intern();
 
 	}
 
