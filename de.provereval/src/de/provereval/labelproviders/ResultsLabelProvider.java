@@ -21,13 +21,13 @@ public class ResultsLabelProvider extends ColumnLabelProvider {
 		for (ProverEvaluationResult candidate : p) {
 			if (candidate.getProverName().equals(name)) {
 				if (candidate.isProven()) {
-					return "\u2713";
+					return "\u2713".intern();
 				} else {
-					return "-";
+					return "-".intern();
 				}
 			}
 		}
 
-		return "No Result";
+		return "No Result".intern();
 	}
 }
