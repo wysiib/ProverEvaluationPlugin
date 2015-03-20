@@ -68,33 +68,22 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 			instance.apply(node, Util.getNullProofMonitor());
 			took = System.currentTimeMillis() - start;
 
-			Stack<ProofTreeNode> childNodes = new Stack<ProofTreeNode>();
-			childNodes.add(node);
-
-			while (!childNodes.isEmpty()) {
-				// add all sub-nodes to stack
-				ProofTreeNode cur = childNodes.pop();
-
-				if (cur.hasChildren()) {
-					childNodes.addAll(Arrays.asList(cur.getChildNodes()));
-				} else {
-					if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
-						if (cur.getRule() != null
-								&& cur.getRule().getDisplayName()
-										.startsWith("Counter-Example found")) {
-							return new ProverEvaluationResult(
-									rProvider.getText(tactic),
-									sProvider.getText(sequent), took,
-									ProverEvaluationTaskStatus.DISPROVEN);
-						} else {
-							return new ProverEvaluationResult(
-									rProvider.getText(tactic),
-									sProvider.getText(sequent), took,
-									ProverEvaluationTaskStatus.NOT_PROVEN);
-						}
-					}
-				}
+			if (findCeNode(node)) {
+				return new ProverEvaluationResult(rProvider.getText(tactic),
+						sProvider.getText(sequent), took,
+						ProverEvaluationTaskStatus.DISPROVEN);
 			}
+
+			if (findUnprovenNode(node)) {
+				return new ProverEvaluationResult(rProvider.getText(tactic),
+						sProvider.getText(sequent), took,
+						ProverEvaluationTaskStatus.NOT_PROVEN);
+			}
+
+			return new ProverEvaluationResult(rProvider.getText(tactic),
+					sProvider.getText(sequent), took,
+					ProverEvaluationTaskStatus.PROVEN);
+
 		} catch (IllegalStateException e) {
 			return new ProverEvaluationResult(rProvider.getText(tactic),
 					sProvider.getText(sequent), took,
@@ -110,10 +99,48 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 					sProvider.getText(sequent), took,
 					ProverEvaluationTaskStatus.CRASHED);
 		}
+	}
 
-		return new ProverEvaluationResult(rProvider.getText(tactic),
-				sProvider.getText(sequent), took,
-				ProverEvaluationTaskStatus.PROVEN);
+	private boolean findUnprovenNode(ProofTreeNode node) {
+		Stack<ProofTreeNode> childNodes = new Stack<ProofTreeNode>();
+		childNodes.add(node);
+
+		while (!childNodes.isEmpty()) {
+			// add all sub-nodes to stack
+			ProofTreeNode cur = childNodes.pop();
+
+			if (cur.hasChildren()) {
+				childNodes.addAll(Arrays.asList(cur.getChildNodes()));
+			}
+
+			if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean findCeNode(ProofTreeNode node) {
+		Stack<ProofTreeNode> childNodes = new Stack<ProofTreeNode>();
+		childNodes.add(node);
+
+		while (!childNodes.isEmpty()) {
+			// add all sub-nodes to stack
+			ProofTreeNode cur = childNodes.pop();
+
+			if (cur.hasChildren()) {
+				childNodes.addAll(Arrays.asList(cur.getChildNodes()));
+			}
+
+			if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
+				if (cur.getRule() != null
+						&& cur.getRule().getDisplayName()
+								.startsWith("Counter-Example found")) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public ProverEvaluationResult getTimeoutResult() {

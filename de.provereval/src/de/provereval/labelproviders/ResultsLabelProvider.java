@@ -22,7 +22,10 @@ public class ResultsLabelProvider extends ColumnLabelProvider {
 			if (candidate.getProverName().equals(name)) {
 				if (candidate.isProven()) {
 					return "\u2713".intern();
+				} else if (candidate.isDisproven()) {
+					return "disproven".intern();
 				} else {
+
 					return "-".intern();
 				}
 			}
