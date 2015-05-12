@@ -1,5 +1,5 @@
 language: java
-script: gradle completeInstall
+script: mvn -f de.provereval.parent/pom.xml clean verify
 after_success: find de.provereval.repository/target/repository/ -type f -exec
   curl -u $FTP_USER:$FTP_PASS --ftp-create-dirs -T {} ftp://cobra.cs.uni-duesseldorf.de/upload/{}
   \;
