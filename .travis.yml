@@ -1,4 +1,5 @@
 language: java
+script: gradle completeInstall
 after_success: find de.provereval.repository/target/repository/ -type f -exec
   curl -u $FTP_USER:$FTP_PASS --ftp-create-dirs -T {} ftp://cobra.cs.uni-duesseldorf.de/upload/{}
   \;
