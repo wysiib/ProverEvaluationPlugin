@@ -1,0 +1,8 @@
+language: java
+after_success: find de.provereval.repository/target/repository/ -type f -exec
+  curl -u $FTP_USER:$FTP_PASS --ftp-create-dirs -T {} ftp://cobra.cs.uni-duesseldorf.de/upload/{}
+  \;
+env:
+  global:
+  - secure: vXYDGFDIYQu9okKTJ33481aODHPSjvBVMDlxE9P0YHozs1L6pKFDuF1o9bEe1yhk4IpbgLIVZC0YnIXkmtNAm4ZL7/a6weP19iP06hQpvyMm+BAnQ2IEJ0cLhEAAcsTWvn0hZg8XFZ0wJV8dhr3jXIAKygAotch7WgrH6+ElS9Y=
+  - secure: eY/GrmwTOwNtkFKqq8nVBdH+iKnlpUWwjwoAmLLp39RS1cPKKRld16PbbSy1kd5MoLocRn9QleKnEFYsvA6QgxA9DU+1fY2UdD/RGumamPfD2+5LpseAkUvTbvMd/d5YJ7q8Gq/8vd4F9MghavacUlrPpYK71tar4OYOUPkU60Q=
