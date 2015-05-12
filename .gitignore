@@ -6,5 +6,4 @@
 *.ear
 /bin
 .gradle
-de.provereval.parent
-de.provereval.repository
+*/target
