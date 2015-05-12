@@ -2,18 +2,17 @@
 	<project
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 		<modelVersion>4.0.0</modelVersion>
-	
+
 		<parent>
 			<groupId>de.provereval</groupId>
 			<artifactId>de.provereval.parent</artifactId>
 			<version>1.0.3.qualifier</version>
 			<relativePath>../de.provereval.parent/pom.xml</relativePath>
 		</parent>
-	
+
 		<groupId>de.provereval</groupId>
 		<artifactId>de.provereval</artifactId>
 		<version>1.0.3.qualifier</version>
 		<packaging>eclipse-plugin</packaging>
-	
+
 	</project>
-	

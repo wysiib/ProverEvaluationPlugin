@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+
+
+	<feature url="features/de.provereval.feature_1.0.3.qualifier.jar" id="de.provereval.feature" version="1.0.3.qualifier">
+		<category name="de.provereval.feature.category"/>
+	</feature>
+
+<category-def name="de.provereval.feature.category" label="Prover Evaluation Plugin">
+      <description>
+A plugin to perform benchmarks for Rodin / Event-B provers like ml, pp or the SMT Solvers plugin.
+      </description>
+   </category-def>
+
+</site>
