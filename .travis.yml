@@ -1,9 +1,14 @@
 language: java
+sudo: false
 script: mvn -f de.provereval.parent/pom.xml clean verify
-after_success: find de.provereval.repository/target/repository/ -type f -exec
-  curl -u $FTP_USER:$FTP_PASS --ftp-create-dirs -T {} ftp://cobra.cs.uni-duesseldorf.de/upload/{}
-  \;
+before_install:
+- rvm install 2.0.0
+- gem install travis-custom-deploy
+after_success:
+- travis-custom-deploy sftp de.provereval.repository/target/repository/
 env:
   global:
-  - secure: vXYDGFDIYQu9okKTJ33481aODHPSjvBVMDlxE9P0YHozs1L6pKFDuF1o9bEe1yhk4IpbgLIVZC0YnIXkmtNAm4ZL7/a6weP19iP06hQpvyMm+BAnQ2IEJ0cLhEAAcsTWvn0hZg8XFZ0wJV8dhr3jXIAKygAotch7WgrH6+ElS9Y=
-  - secure: eY/GrmwTOwNtkFKqq8nVBdH+iKnlpUWwjwoAmLLp39RS1cPKKRld16PbbSy1kd5MoLocRn9QleKnEFYsvA6QgxA9DU+1fY2UdD/RGumamPfD2+5LpseAkUvTbvMd/d5YJ7q8Gq/8vd4F9MghavacUlrPpYK71tar4OYOUPkU60Q=
+  - secure: K+jIOQ09kVPQxIL7NJh8/KitIMOFHt/NTjZV0X0LH8UbtUqrQ6WF4vpbR+nsK0n4JNYa9/wCNWbYybuOfjCXApJYADSSo2zGcr/RRMhqd3pc8r7TFY7BFJx7lsvfYd4zirGQX3j/7bcyG7L1NsQsjA9j4G0w8PJ9Jh0Nq5cZDT0=
+  - secure: sfZiE7BeEEmq1uIZFUOf7fH/kpP28RwxG8JQbM12qECuCKYbTgoGfQjfnQ2XyljYC1s/YyMOCuY+Z1U9P69OJ5BmmGTqdKKMm56zTZE5xwtiIzM2imuZw8w4Jaq+2Wiu15AO19sbhzE3zrzapTswDCUiycjfrSw2O7CFauukTZU=
+  - secure: eRmWPCm0IA1UbEGztpWVSye8of/uZ+DG6E3PZs8r8Lv1Q1/lalpYPF16fQAngm2NljKT+ivTrBMtYe95mWmc0rv3BTtos/FYxVabWs41jSNf4BGq7z+qbf46UqjABaujV4MB4uflDo1shlbQ9YoWgaES9JtPuNszHhSVjmvFqlg=
+  - secure: Uzt9K+DXuDodOJD1M+q0keW9vWo1xuF4+akUphhRxnUiaDJauEfPrMP0rc2yB5dWpbCAyTaKoZn4/EjhpKAGtj5HxEvw49pQ7g0i0stTXyRf5FvkPe2WgCd76cpRrHKeOhOG2Ri48rtf7P6LqafoHAHLGFuRz45Q3R6i/bstZxw=
