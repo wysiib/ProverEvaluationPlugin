@@ -53,8 +53,7 @@ public class EvalCommand extends AbstractHandler {
 			headless = true;
 		} else {
 			headless = false;
-			shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getShell();
+			shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 		}
 	}
 
@@ -64,10 +63,8 @@ public class EvalCommand extends AbstractHandler {
 		// get all reasoners and ask the user which ones to benchmark
 		List<IPrefMapEntry<ITacticDescriptor>> allReasoners = getAllTactics();
 		if (!headless) {
-			ListSelectionDialog dlg = new ListSelectionDialog(shell,
-					allReasoners, new ArrayContentProvider(),
-					new ReasonersLabelProvider(),
-					"Select the reasoners you want to apply:");
+			ListSelectionDialog dlg = new ListSelectionDialog(shell, allReasoners, new ArrayContentProvider(),
+					new ReasonersLabelProvider(), "Select the reasoners you want to apply:");
 			dlg.setTitle("Select Reasoners");
 			dlg.setInitialSelections(allReasoners.toArray());
 			dlg.open();
@@ -83,16 +80,12 @@ public class EvalCommand extends AbstractHandler {
 		try {
 			allProverSequents = getAllProverSequents();
 		} catch (RodinDBException rdb) {
-			MessageDialog
-					.openError(
-							shell,
-							"A RodinDBException Occured",
-							"A RodinDBException occured while fetching available tactics. Benchmarks have been aborted.");
+			MessageDialog.openError(shell, "A RodinDBException Occured",
+					"A RodinDBException occured while fetching available tactics. Benchmarks have been aborted.");
 			return null;
 		}
 		if (!headless) {
-			SequentSelectionDialog ssDiag = new SequentSelectionDialog(shell,
-					allProverSequents);
+			SequentSelectionDialog ssDiag = new SequentSelectionDialog(shell, allProverSequents);
 			ssDiag.open();
 			allProverSequents.clear();
 			allProverSequents.addAll(ssDiag.getSelectedProverSequents());
@@ -107,12 +100,11 @@ public class EvalCommand extends AbstractHandler {
 
 		if (!runnable.isCanceled()) {
 
-			Map<String, List<ProverEvaluationResult>> grouped = groupTasksBySequent(runnable
-					.getResults());
+			Map<String, List<ProverEvaluationResult>> grouped = groupTasksBySequent(runnable.getResults());
 
 			if (headless) {
 				String[] applicationArgs = Platform.getApplicationArgs();
-				CSVExporter.exportToCSVFile(grouped, applicationArgs[0]);
+				CSVExporter.exportToCSVFile(grouped, applicationArgs[0], false);
 			} else {
 				new ResultDialog(shell, grouped).open();
 			}
@@ -121,15 +113,13 @@ public class EvalCommand extends AbstractHandler {
 		return null;
 	}
 
-	private Map<String, List<ProverEvaluationResult>> groupTasksBySequent(
-			List<ProverEvaluationResult> results) {
+	private Map<String, List<ProverEvaluationResult>> groupTasksBySequent(List<ProverEvaluationResult> results) {
 		Map<String, List<ProverEvaluationResult>> grouped = new HashMap<String, List<ProverEvaluationResult>>();
 
 		for (ProverEvaluationResult result : results) {
 			String sequentName = result.getProofObligationName();
 			if (!grouped.containsKey(sequentName)) {
-				grouped.put(sequentName,
-						new ArrayList<ProverEvaluationResult>());
+				grouped.put(sequentName, new ArrayList<ProverEvaluationResult>());
 			}
 			grouped.get(sequentName).add(result);
 		}
@@ -154,12 +144,10 @@ public class EvalCommand extends AbstractHandler {
 
 	private List<IPrefMapEntry<ITacticDescriptor>> getAllTactics() {
 		IPreferencesService ps = Platform.getPreferencesService();
-		String string = ps.getString("org.eventb.core", "Tactics Map",
-				"nix nada nothing", null);
+		String string = ps.getString("org.eventb.core", "Tactics Map", "nix nada nothing", null);
 		// System.out.println(string);
 
-		CachedPreferenceMap<ITacticDescriptor> preferenceMap = TacticPreferenceFactory
-				.makeTacticPreferenceMap();
+		CachedPreferenceMap<ITacticDescriptor> preferenceMap = TacticPreferenceFactory.makeTacticPreferenceMap();
 		preferenceMap.inject(string);
 
 		return preferenceMap.getEntries();

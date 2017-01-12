@@ -13,12 +13,10 @@ import java.util.Map;
 import de.provereval.ProverEvaluationResult;
 
 public class CSVExporter {
-	public static void exportToCSVFile(
-			Map<String, List<ProverEvaluationResult>> grouped, String path) {
+	public static void exportToCSVFile(Map<String, List<ProverEvaluationResult>> grouped, String path, boolean append) {
 		BufferedWriter writer = null;
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(path)));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, append)));
 
 			// get a list of solvers
 			List<String> reasoners = new ArrayList<String>();
@@ -30,16 +28,18 @@ public class CSVExporter {
 			}
 
 			// header of csv file
-			writer.write("Sequent,");
-			for (int i = 0; i < reasoners.size(); i++) {
-				writer.write(reasoners.get(i));
-				writer.write(",");
-				writer.write(reasoners.get(i) + "_Time");
-				if (i + 1 < reasoners.size()) {
+			if (!append) {
+				writer.write("Sequent,");
+				for (int i = 0; i < reasoners.size(); i++) {
+					writer.write(reasoners.get(i));
 					writer.write(",");
+					writer.write(reasoners.get(i) + "_Time");
+					if (i + 1 < reasoners.size()) {
+						writer.write(",");
+					}
 				}
+				writer.newLine();
 			}
-			writer.newLine();
 
 			List<String> keys = new ArrayList<String>(grouped.keySet());
 			Collections.sort(keys);
@@ -48,8 +48,7 @@ public class CSVExporter {
 				writer.write(key.replace("\n", "") + ",");
 
 				for (int i = 0; i < reasoners.size(); i++) {
-					ProverEvaluationResult task = getResult(reasoners.get(i),
-							grouped.get(key));
+					ProverEvaluationResult task = getResult(reasoners.get(i), grouped.get(key));
 					if (task.isProven()) {
 						writer.write("1");
 					} else if (task.isDisproven()) {
@@ -78,8 +77,7 @@ public class CSVExporter {
 
 	}
 
-	private static ProverEvaluationResult getResult(String reasoner,
-			List<ProverEvaluationResult> list) {
+	private static ProverEvaluationResult getResult(String reasoner, List<ProverEvaluationResult> list) {
 		for (ProverEvaluationResult t : list) {
 			if (t.getProverName().equals(reasoner)) {
 				return t;
