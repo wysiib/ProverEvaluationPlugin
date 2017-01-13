@@ -21,30 +21,23 @@ import org.eventb.internal.core.seqprover.ProofTreeNode;
 import org.eventb.internal.core.seqprover.Util;
 import org.rodinp.core.RodinDBException;
 
-import de.provereval.labelproviders.ReasonersLabelProvider;
-import de.provereval.labelproviders.SequentsLabelProvider;
-
 @SuppressWarnings("restriction")
 public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
-	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
-	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
 	private final IPrefMapEntry<ITacticDescriptor> tactic;
 	private final IPOSequent sequent;
 
-	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner,
-			IPOSequent sequent) {
+	public ProverEvaluationTask(IPrefMapEntry<ITacticDescriptor> reasoner, IPOSequent sequent) {
 		super();
 		this.tactic = reasoner;
 		this.sequent = sequent;
 	}
 
-	public static IProverSequent toProverSequent(IPOSequent sequent)
-			throws RodinDBException {
+	public static IProverSequent toProverSequent(IPOSequent sequent) throws RodinDBException {
 		IPORoot poRoot = (IPORoot) sequent.getRoot();
 		IProofManager pm = EventBPlugin.getProofManager();
 		IProofComponent pc = pm.getProofComponent(poRoot);
-		IProofAttempt pa = pc.createProofAttempt(sequent.getElementName(),
-				"Translation in Prover Evaluation Plugin", null);
+		IProofAttempt pa = pc.createProofAttempt(sequent.getElementName(), "Translation in Prover Evaluation Plugin",
+				null);
 
 		IProofTree proofTree = pa.getProofTree();
 
@@ -58,8 +51,7 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	public ProverEvaluationResult call() {
 		long took = 0;
 		try {
-			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null)
-					.getRoot();
+			ProofTreeNode node = new ProofTree(toProverSequent(sequent), null).getRoot();
 
 			ITacticDescriptor descriptor = tactic.getValue();
 			ITactic instance = descriptor.getTacticInstance();
@@ -69,35 +61,23 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 			took = System.currentTimeMillis() - start;
 
 			if (findCeNode(node)) {
-				return new ProverEvaluationResult(rProvider.getText(tactic),
-						sProvider.getText(sequent), took,
-						ProverEvaluationTaskStatus.DISPROVEN);
+				return new ProverEvaluationResult(tactic, sequent, took, ProverEvaluationTaskStatus.DISPROVEN);
 			}
 
 			if (findUnprovenNode(node)) {
-				return new ProverEvaluationResult(rProvider.getText(tactic),
-						sProvider.getText(sequent), took,
-						ProverEvaluationTaskStatus.NOT_PROVEN);
+				return new ProverEvaluationResult(tactic, sequent, took, ProverEvaluationTaskStatus.NOT_PROVEN);
 			}
 
-			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took,
-					ProverEvaluationTaskStatus.PROVEN);
+			return new ProverEvaluationResult(tactic, sequent, took, ProverEvaluationTaskStatus.PROVEN);
 
 		} catch (IllegalStateException e) {
-			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took,
-					ProverEvaluationTaskStatus.CRASHED);
+			return new ProverEvaluationResult(tactic, sequent, took, ProverEvaluationTaskStatus.CRASHED);
 		} catch (RodinDBException e) {
-			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took,
-					ProverEvaluationTaskStatus.CRASHED);
+			return new ProverEvaluationResult(tactic, sequent, took, ProverEvaluationTaskStatus.CRASHED);
 		} catch (NullPointerException e) {
 			// these are caused by an error in the provers, so this is a bug!
 			// maybe the result should be reported differently
-			return new ProverEvaluationResult(rProvider.getText(tactic),
-					sProvider.getText(sequent), took,
-					ProverEvaluationTaskStatus.CRASHED);
+			return new ProverEvaluationResult(tactic, sequent, took, ProverEvaluationTaskStatus.CRASHED);
 		}
 	}
 
@@ -133,9 +113,7 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 			}
 
 			if (cur.getConfidence() < IConfidence.DISCHARGED_MAX) {
-				if (cur.getRule() != null
-						&& cur.getRule().getDisplayName()
-								.startsWith("Counter-Example found")) {
+				if (cur.getRule() != null && cur.getRule().getDisplayName().startsWith("Counter-Example found")) {
 					return true;
 				}
 			}
@@ -144,8 +122,6 @@ public class ProverEvaluationTask implements Callable<ProverEvaluationResult> {
 	}
 
 	public ProverEvaluationResult getTimeoutResult() {
-		return new ProverEvaluationResult(rProvider.getText(tactic),
-				sProvider.getText(sequent), 25000,
-				ProverEvaluationTaskStatus.NOT_PROVEN);
+		return new ProverEvaluationResult(tactic, sequent, 25000, ProverEvaluationTaskStatus.NOT_PROVEN);
 	}
 }

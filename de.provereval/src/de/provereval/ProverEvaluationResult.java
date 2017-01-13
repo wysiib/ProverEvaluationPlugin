@@ -1,15 +1,25 @@
 package de.provereval;
 
+import org.eventb.core.IPOSequent;
+import org.eventb.core.preferences.IPrefMapEntry;
+import org.eventb.core.seqprover.ITacticDescriptor;
+
+import de.provereval.labelproviders.ReasonersLabelProvider;
+import de.provereval.labelproviders.SequentsLabelProvider;
+
 public class ProverEvaluationResult {
+	final private static SequentsLabelProvider sProvider = new SequentsLabelProvider();
+	final private static ReasonersLabelProvider rProvider = new ReasonersLabelProvider();
+
 	private final ProverEvaluationTaskStatus status;
 	private final long took;
-	private final String sequentName;
-	private final String proverName;
+	private final IPOSequent sequent;
+	private final IPrefMapEntry<ITacticDescriptor> prover;
 
-	public ProverEvaluationResult(String proverName, String sequentName,
-			long took, ProverEvaluationTaskStatus status) {
-		this.proverName = proverName;
-		this.sequentName = sequentName;
+	public ProverEvaluationResult(IPrefMapEntry<ITacticDescriptor> tactic, IPOSequent sequent, long took,
+			ProverEvaluationTaskStatus status) {
+		this.prover = tactic;
+		this.sequent = sequent;
 		this.took = took;
 		this.status = status;
 	}
@@ -27,10 +37,10 @@ public class ProverEvaluationResult {
 	}
 
 	public String getProofObligationName() {
-		return sequentName;
+		return sProvider.getText(sequent);
 	}
 
 	public String getProverName() {
-		return proverName;
+		return rProvider.getText(prover);
 	}
 }
