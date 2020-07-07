@@ -7,3 +7,6 @@
 /bin
 .gradle
 */target
+
+# mac stuff
+.DS_Store
