@@ -2,7 +2,7 @@ language: java
 sudo: false
 script: mvn -f de.provereval.parent/pom.xml clean verify
 before_install:
-- rvm install 2.0.0
+- rvm install 2.3.0
 - gem install travis-custom-deploy
 after_success:
 - travis-custom-deploy sftp de.provereval.repository/target/repository/
