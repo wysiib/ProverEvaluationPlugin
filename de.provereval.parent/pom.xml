@@ -18,7 +18,7 @@
 	<repository>
 	  <id>targetRepository0</id>
 	  <layout>p2</layout>
-	  <url>http://download.eclipse.org/releases/luna/</url>
+	  <url>http://download.eclipse.org/releases/oxygen/</url>
 	</repository>
 
 	<repository>
