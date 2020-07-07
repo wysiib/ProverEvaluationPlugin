@@ -9,12 +9,12 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.rodinp.core,
  org.eventb.core,
- org.eventb.core.seqprover;bundle-version="[3.0.0,3.2.0)",
+ org.eventb.core.seqprover;bundle-version="[3.0.0,4.0.0)",
  org.eclipse.ui.workbench,
  org.eclipse.osgi,
  org.eclipse.core.jobs,
  org.eclipse.jface
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eventb.internal.ui.preferences.tactics,
  org.eventb.ui
