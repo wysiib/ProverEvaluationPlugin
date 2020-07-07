@@ -2,7 +2,7 @@
 <site>
 
 
-	<feature url="features/de.provereval.feature_1.0.4.qualifier.jar" id="de.provereval.feature" version="1.0.4.qualifier">
+	<feature url="features/de.provereval.feature_1.0.5.jar" id="de.provereval.feature" version="1.0.5">
 		<category name="de.provereval.feature.category"/>
 	</feature>
 
